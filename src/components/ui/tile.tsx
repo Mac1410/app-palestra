@@ -3,11 +3,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { Colors, Ember, Radius, Spacing } from '@/constants/theme';
+import { Colors, Linfa, Radius, Spacing } from '@/constants/theme';
 import { useHaptics } from '@/hooks/use-haptics';
 
-/** Tessera in gradiente brace, con etichetta a pillola bianca in basso. */
-export function EmberTile({
+/** Tessera in gradiente verde, con etichetta a pillola bianca in basso. */
+export function LinfaTile({
   title,
   action,
   tone = 'a',
@@ -19,7 +19,7 @@ export function EmberTile({
   onPress: () => void;
 }) {
   const haptics = useHaptics();
-  const colors = tone === 'a' ? Ember.tileA : Ember.tileB;
+  const colors = tone === 'a' ? Linfa.tileA : Linfa.tileB;
 
   return (
     <Pressable
@@ -98,12 +98,12 @@ const styles = StyleSheet.create({
     paddingRight: Spacing.one,
     paddingVertical: Spacing.one + 1,
   },
-  chipText: { color: '#1A0F0A' },
+  chipText: { color: '#0A1A10' },
   chipIcon: {
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#1A0F0A',
+    backgroundColor: '#0A1A10',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -120,6 +120,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.textMuted,
     borderRadius: 1,
   },
-  tickMajor: { backgroundColor: '#7A5B4C' },
-  tickCenter: { width: 1.5, backgroundColor: '#FFC79E' },
+  tickMajor: { backgroundColor: '#4F7A63' },
+  tickCenter: { width: 1.5, backgroundColor: '#C7FFD9' },
 });

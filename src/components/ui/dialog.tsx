@@ -5,7 +5,7 @@
  * installata sull'iPhone le conferme native non comparirebbero e azioni come
  * "termina allenamento" resterebbero senza risposta. Questi dialoghi sono
  * normali viste, quindi identiche su iOS, Android e web, e seguono la palette
- * Ember invece dell'aspetto di sistema.
+ * Linfa invece dell'aspetto di sistema.
  */
 
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';

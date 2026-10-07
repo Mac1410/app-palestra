@@ -89,8 +89,8 @@ libero) e perché, come sono stati scelti serie, ripetizioni e recuperi, cosa è
 stato escluso per via delle limitazioni dichiarate. Le schede restano
 modificabili come tutte le altre.
 
-**Oggi** — il volume della settimana come numero protagonista dentro l'anello di
-brace, con il confronto sulla settimana precedente; sotto, avanzamento verso
+**Oggi** — il volume della settimana come numero protagonista dentro l'anello
+luminoso, con il confronto sulla settimana precedente; sotto, avanzamento verso
 l'obiettivo con il calendario dei sette giorni, scheda consigliata (la meno
 recente, così la rotazione push/pull/legs viene da sé), avvio di un allenamento
 libero e ultimi allenamenti.
@@ -122,17 +122,22 @@ progressione, che scrive anche perché.
 
 ## Direzione visiva
 
-L'app segue la direzione **Ember**: brace su nero, un unico tema scuro per
-scelta di identità (`userInterfaceStyle: "dark"`), numero del volume settimanale
-come protagonista dentro un anello incandescente, tessere in gradiente arancione.
+L'app segue la direzione **Linfa**: verde chiaro su fondo scuro, un unico tema
+per scelta di identità (`userInterfaceStyle: "dark"`), numero del volume
+settimanale come protagonista dentro un anello luminoso, tessere in gradiente
+verde. Sul verde il testo diventa scuro (`onAccent`), non bianco: è l'unico modo
+di restare leggibili su un colore chiaro.
 
-Il bagliore e l'anello sono disegnati in `src/components/ember-backdrop.tsx` con
+Il bagliore e l'anello sono disegnati in `src/components/linfa-backdrop.tsx` con
 `react-native-svg`: niente filtri di sfocatura, il diffuso nasce da archi
 sovrapposti a opacità calanti — resa identica su iOS e Android e molto più
 leggera da comporre.
 
-Le sei direzioni valutate prima di scegliere stanno in
-[`design/direzioni.html`](design/direzioni.html), apribile in un browser.
+L'icona nasce dalla stessa palette e si rigenera con `npm run icona`.
+
+Le sei direzioni valutate all'inizio stanno in
+[`design/direzioni.html`](design/direzioni.html), apribile in un browser: la
+pagina racconta la scelta di allora, quando la palette era la brace arancione.
 
 ## Struttura del progetto
 
@@ -154,7 +159,7 @@ src/
     programma.tsx         il programma generato e le sue motivazioni
     impostazioni.tsx
   components/             UI riutilizzabile (Card, Button, Chip, grafici…)
-  constants/theme.ts      palette Ember, spaziature, raggi
+  constants/theme.ts      palette Linfa, spaziature, raggi
   data/exercises.ts       catalogo di base e schede di esempio
   hooks/                  tema e feedback aptico
   lib/                    formattazione italiana, calcoli (volume, 1RM, streak),
@@ -167,7 +172,7 @@ scripts/
   build-web.mjs           costruisce la web app installabile
   serve-dist.mjs          la prova in locale come se fosse online
   deploy-pages.mjs        la pubblica su GitHub Pages
-  genera-icona.mjs        disegna l'icona dell'app (brace, anello, bilanciere)
+  genera-icona.mjs        disegna l'icona dell'app (anello verde, bilanciere)
   prova-programmi.mjs     genera i programmi di diciannove profili e li controlla
   prova-progressione.mjs  verifica le decisioni su carichi e varianti
 ```

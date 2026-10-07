@@ -21,8 +21,8 @@ import process from 'node:process';
 const ROOT = path.resolve(import.meta.dirname, '..');
 const DIST = path.join(ROOT, 'dist');
 
-const BACKGROUND = '#0B0A0A';
-const ACCENT = '#FF6B2C';
+const BACKGROUND = '#080B09';
+const ACCENT = '#7BE495';
 
 /** Normalizza "app-palestra" o "/app-palestra/" in "/app-palestra/". */
 function normalizeBase(value) {

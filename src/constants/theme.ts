@@ -1,5 +1,5 @@
 /**
- * Direzione visiva "Ember": brace su nero.
+ * Direzione visiva "Linfa": verde chiaro su fondo scuro.
  * L'app è deliberatamente a tema unico scuro — la palette è l'identità,
  * non una preferenza di sistema, quindi non esiste una variante chiara.
  */
@@ -10,33 +10,33 @@ import { Platform } from 'react-native';
 
 export const Colors = {
   text: '#FFFFFF',
-  textSecondary: '#8B8583',
-  textMuted: '#6F6967',
-  background: '#0B0A0A',
-  backgroundElement: '#1A1819',
-  backgroundSelected: '#262223',
-  border: '#232021',
-  accent: '#FF6B2C',
-  accentSoft: '#2A1610',
-  onAccent: '#FFFFFF',
-  success: '#3DD68C',
-  successSoft: '#12301F',
+  textSecondary: '#8E9A90',
+  textMuted: '#6D7971',
+  background: '#080B09',
+  backgroundElement: '#141A16',
+  backgroundSelected: '#1E2721',
+  border: '#1F2821',
+  accent: '#7BE495',
+  accentSoft: '#10251A',
+  onAccent: '#06160D',
+  success: '#34C79A',
+  successSoft: '#0F2A24',
   danger: '#FF6369',
   dangerSoft: '#3A1B1D',
-  track: '#262223',
+  track: '#1E2721',
 } as const;
 
 export type ThemeColor = keyof typeof Colors;
 export type Theme = typeof Colors;
 
-/** Sfumature della brace, usate da tessere, anello e bagliore. */
-export const Ember = {
-  tileA: ['#E2481B', '#8E2A18'] as const,
-  tileB: ['#C63A16', '#6E2314'] as const,
-  ring: ['#FFB57A', '#FF7A32', '#D6280F'] as const,
-  glowHot: '#FF5C1A',
-  glowWarm: '#FFB058',
-  glowDeep: '#D62010',
+/** Sfumature del verde, usate da tessere, anello e bagliore. */
+export const Linfa = {
+  tileA: ['#5FD68A', '#2C7A4F'] as const,
+  tileB: ['#49C27A', '#1F5F3D'] as const,
+  ring: ['#D4F8D0', '#7BE495', '#2E9E5B'] as const,
+  glowHot: '#49D983',
+  glowWarm: '#B6F3C0',
+  glowDeep: '#1C7A48',
 } as const;
 
 export const Fonts = Platform.select({

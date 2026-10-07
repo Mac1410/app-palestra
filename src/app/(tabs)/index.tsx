@@ -3,12 +3,12 @@ import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { EmberBackdrop } from '@/components/ember-backdrop';
+import { LinfaBackdrop } from '@/components/linfa-backdrop';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/feedback';
-import { EmberTile, Ruler } from '@/components/ui/tile';
+import { LinfaTile, Ruler } from '@/components/ui/tile';
 import { BottomTabInset, Colors, MaxContentWidth, Radius, Spacing } from '@/constants/theme';
 import {
   addDays,
@@ -72,7 +72,7 @@ export default function TodayScreen() {
   return (
     <View style={styles.root}>
       <View style={styles.backdrop} pointerEvents="none">
-        <EmberBackdrop width={width} />
+        <LinfaBackdrop width={width} />
       </View>
 
       <SafeAreaView edges={['top']} style={styles.flex}>
@@ -202,12 +202,12 @@ export default function TodayScreen() {
             </Card>
           ) : suggested ? (
             <View style={styles.tiles}>
-              <EmberTile
+              <LinfaTile
                 title={suggested.name}
                 action={`${suggested.exercises.reduce((sum, e) => sum + e.sets, 0)} serie`}
                 onPress={() => startRoutine(suggested.id)}
               />
-              <EmberTile
+              <LinfaTile
                 title="Progressi"
                 action="Dettagli"
                 tone="b"
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: '#B4260F',
+    backgroundColor: '#2C7A4F',
     borderWidth: 2,
     borderColor: 'rgba(255,255,255,0.7)',
     alignItems: 'center',
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: 'rgba(255,255,255,0.34)',
-    backgroundColor: 'rgba(20,14,12,0.5)',
+    backgroundColor: 'rgba(14,20,16,0.5)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -323,8 +323,8 @@ const styles = StyleSheet.create({
   pill: {
     marginTop: Spacing.two,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: 'rgba(255,168,110,0.85)',
-    backgroundColor: 'rgba(12,8,7,0.35)',
+    borderColor: 'rgba(168,240,186,0.85)',
+    backgroundColor: 'rgba(7,14,10,0.35)',
     borderRadius: Radius.pill,
     paddingHorizontal: Spacing.four - 2,
     paddingVertical: Spacing.two + 2,

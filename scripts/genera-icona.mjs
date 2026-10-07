@@ -3,8 +3,8 @@
  *
  *   node scripts/genera-icona.mjs
  *
- * Disegna la direzione "Ember" — brace su nero, anello incandescente, bilanciere
- * al centro — e scrive assets/images/icon.png (1024) e favicon.png (196).
+ * Disegna la direzione "Linfa" — verde chiaro su fondo scuro, anello luminoso,
+ * bilanciere al centro — e scrive assets/images/icon.png (1024) e favicon.png (196).
  *
  * Il disegno è fatto a mano, pixel per pixel, invece che con una libreria
  * grafica: l'immagine è di sole forme geometriche e così il progetto non si
@@ -20,12 +20,12 @@ const ROOT = path.resolve(import.meta.dirname, '..');
 
 // --- palette (la stessa di src/constants/theme.ts) -------------------------
 
-const SFONDO = [11, 10, 10];
-const BRACE_CALDA = [255, 92, 26];
+const SFONDO = [8, 11, 9];
+const BAGLIORE = [73, 217, 131];
 const ANELLO = [
-  [255, 181, 122],
-  [255, 122, 50],
-  [214, 40, 15],
+  [212, 248, 208],
+  [123, 228, 149],
+  [46, 158, 91],
 ];
 const METALLO = [255, 255, 255];
 
@@ -61,14 +61,14 @@ function colorePunto(x, y) {
   const cx = 512;
   const cy = 512;
 
-  // 1. Sfondo con il bagliore della brace, più intenso in alto.
+  // 1. Sfondo con il bagliore verde, più intenso in alto.
   const dxGlow = x - 512;
   const dyGlow = y - 300;
   const distanzaGlow = Math.hypot(dxGlow, dyGlow * 1.15);
   const intensita = Math.exp(-(distanzaGlow * distanzaGlow) / (2 * 330 * 330));
-  let colore = mix(SFONDO, BRACE_CALDA, intensita * 0.55);
+  let colore = mix(SFONDO, BAGLIORE, intensita * 0.55);
 
-  // 2. Anello incandescente, aperto in alto a destra.
+  // 2. Anello luminoso, aperto in basso.
   const distanza = Math.hypot(x - cx, y - cy);
   const spessore = 46;
   const raggio = 368;
@@ -103,9 +103,9 @@ function colorePunto(x, y) {
   const discoEsternoDx = dentroRettangolo(x, y, 738, cy, 48, 160, 20);
 
   if (barra || discoInternoSx || discoInternoDx || discoEsternoSx || discoEsternoDx) {
-    // Un filo di calore sul metallo, più acceso verso il basso.
-    const calore = Math.min(0.22, Math.max(0, (y - 380) / 900));
-    colore = mix(METALLO, BRACE_CALDA, calore);
+    // Un velo di verde sul metallo, più acceso verso il basso.
+    const riflesso = Math.min(0.2, Math.max(0, (y - 380) / 900));
+    colore = mix(METALLO, BAGLIORE, riflesso);
   }
 
   return colore;
