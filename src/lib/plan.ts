@@ -151,6 +151,33 @@ function schemeFor(exercise: Exercise, profile: Profile): Scheme {
     return { sets: 2, reps: '8-10 lente', restSec: 30 };
   }
 
+  // Senza carico da aggiungere, chiedere 6 ripetizioni di piegamenti non ha
+  // senso: sono facili, e una serie facile non costruisce niente. La fatica
+  // arriva più in là, quindi l'intervallo si alza — e quando anche quello
+  // diventa comodo, la progressione passa a una variante più dura (vedi
+  // lib/progression.ts), che è il vero modo di "aggiungere peso" a casa.
+  const senzaCarico = exercise.equipment === 'Corpo libero' || exercise.equipment === 'Elastico';
+  if (senzaCarico && (profile.goal === 'massa' || profile.goal === 'forza')) {
+    const alzato: Record<ExerciseRole, string> = {
+      fondamentale: profile.goal === 'forza' ? '6-10' : '8-12',
+      complementare: '10-15',
+      isolamento: '12-20',
+    };
+    // E il recupero può essere più corto: senza bilanciere il sistema nervoso
+    // non prende la stessa botta, e tre minuti fra una serie di piegamenti e
+    // l'altra sono tempo buttato.
+    const recuperoMassimo: Record<ExerciseRole, number> = {
+      fondamentale: 120,
+      complementare: 90,
+      isolamento: 60,
+    };
+    return {
+      sets,
+      reps: alzato[role],
+      restSec: Math.min(base.restSec, recuperoMassimo[role]),
+    };
+  }
+
   return { ...base, sets };
 }
 
@@ -518,10 +545,26 @@ function postureSlots(variant: 'A' | 'B'): Slot[] {
 export function chooseSplit(profile: Profile): SplitKind {
   const { daysPerWeek, sessionMinutes, place, goal } = profile;
 
-  // A casa senza attrezzi il lavoro a carico naturale si organizza a circuito.
   const equipment = availableEquipment(profile);
   const onlyBodyweight = equipment.size === 1 && equipment.has('Corpo libero');
-  if (onlyBodyweight && place === 'casa') return 'circuito';
+
+  // A casa senza attrezzi il circuito è la forma più efficiente... ma solo se
+  // l'obiettivo è il dispendio. Per crescere servono serie vicine al limite e
+  // recuperi pieni, e un circuito è esattamente il contrario: le pause corte
+  // fanno crollare le ripetizioni e con esse la tensione che costruisce il
+  // muscolo. Chi punta a massa o forza viene allenato a serie, anche a casa.
+  if (onlyBodyweight && place === 'casa' && goal !== 'massa' && goal !== 'forza') {
+    return 'circuito';
+  }
+
+  if (onlyBodyweight && place === 'casa') {
+    // Il catalogo a corpo libero è corto, e senza una sbarra non esiste
+    // nessun modo di tirare: una seduta "Pull" diventerebbe un'ora di plank.
+    // Meglio poche sedute complete che tante sedute mezze vuote.
+    const puoTirare = profile.equipment.includes('sbarra');
+    if (!puoTirare) return 'full-body';
+    return daysPerWeek >= 4 ? 'upper-lower' : daysPerWeek === 3 ? 'push-pull-legs' : 'full-body';
+  }
 
   // Sotto l'ora, una seduta non regge più di due gruppi muscolari fatti bene.
   const shortSession = sessionMinutes < 60;
@@ -796,8 +839,10 @@ function fitToTime(planned: PlannedItem[], budget: number, profile: Profile): Pl
 
   let guard = 60;
   while (total() > limit && guard-- > 0) {
+    // Si toglie un complemento solo finché la seduta resta una seduta: meglio
+    // tre esercizi da tre serie che due da quattro.
     const lastOptional = items.map((item) => item.optional).lastIndexOf(true);
-    if (lastOptional !== -1) {
+    if (lastOptional !== -1 && items.length > MIN_EXERCISES) {
       items.splice(lastOptional, 1);
       continue;
     }
@@ -849,8 +894,8 @@ function topUp(
   // Due passate: con sedute lunghe una sola lista di riserve non basta a
   // coprire il tempo disponibile.
   for (const slot of [...extras, ...extras]) {
-    // Sotto gli otto minuti liberi non vale la pena aggiungere altro.
-    if (budget - total() < 8) return;
+    // Sotto i sei minuti liberi non vale la pena aggiungere altro.
+    if (budget - total() < 6) return;
 
     const exercise = pick(slot, picker);
     if (!exercise) continue;
@@ -1002,9 +1047,19 @@ function explain(profile: Profile, split: SplitKind, routines: Routine[]): strin
   );
 
   if (profile.goal === 'massa') {
+    const senzaAttrezzi = profile.place === 'casa' && profile.equipment.length === 0;
+
     reasons.push(
-      'Per la massa il programma non propone mai sedute per tutto il corpo: servono carichi alti, recuperi pieni fra le serie e più di un esercizio per gruppo, e in una seduta sola non ci starebbero.',
+      senzaAttrezzi
+        ? 'Niente circuiti: tengono alto il battito ma rovinano il lavoro di forza, perché con le pause corte le ripetizioni crollano. Qui si fanno serie vere con recupero pieno, su tutto il corpo, perché senza attrezzi gli esercizi disponibili non bastano a riempire sedute separate.'
+        : 'Per la massa il programma non propone mai sedute per tutto il corpo: servono carichi alti, recuperi pieni fra le serie e più di un esercizio per gruppo, e in una seduta sola non ci starebbero.',
     );
+
+    if (senzaAttrezzi) {
+      reasons.push(
+        'Senza pesi il carico si aumenta cambiando esercizio: le ripetizioni partono più alte e, quando diventano comode, il programma passa a una variante più difficile — piegamenti a diamante, poi ad arciere, squat su una gamba.',
+      );
+    }
   }
 
   reasons.push(
@@ -1029,7 +1084,7 @@ function explain(profile: Profile, split: SplitKind, routines: Routine[]): strin
 
   if (profile.place === 'casa' && !profile.equipment.includes('sbarra')) {
     reasons.push(
-      'Senza una sbarra per trazioni il lavoro di tirata resta limitato: un elastico o una sbarra da porta aprirebbero parecchi esercizi in più.',
+      'Senza una sbarra per trazioni il lavoro di tirata è di fatto impossibile, e si vede: la schiena resta la parte scoperta del programma. Una sbarra da porta o un elastico cambierebbero molto, e costano poco.',
     );
   }
 

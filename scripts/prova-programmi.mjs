@@ -114,6 +114,11 @@ const scenarios = [
   ],
   ['Principiante, 2× 45min', { experience: 'principiante', daysPerWeek: 2, sessionMinutes: 45 }],
   ['Casa senza attrezzi, 4× 30min', { place: 'casa', daysPerWeek: 4, sessionMinutes: 30 }],
+  ['Massa a casa senza attrezzi, 3× 45min', { place: 'casa', daysPerWeek: 3, sessionMinutes: 45 }],
+  [
+    'Dimagrire a casa senza attrezzi, 4× 40min',
+    { place: 'casa', goal: 'dimagrimento', daysPerWeek: 4, sessionMinutes: 40 },
+  ],
   [
     'Casa con manubri e panca, 3× 45min',
     { place: 'casa', equipment: ['manubri', 'panca'], sessionMinutes: 45 },
