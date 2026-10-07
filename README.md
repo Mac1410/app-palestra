@@ -219,12 +219,24 @@ guardando **solo le ultime tre settimane**: com'eri tre mesi fa non dice più
 niente su che carico reggi adesso.
 
 Il metodo è la doppia progressione. Si resta sullo stesso peso finché non si
-chiudono *tutte* le serie in cima all'intervallo di ripetizioni; allora si
-aggiunge un gradino di carico (2,5 kg di bilanciere, 1-2 kg di manubrio, 5 kg di
-macchina) e si riparte dal fondo dell'intervallo. Se invece l'obiettivo non
-viene raggiunto, prima si abbassa l'obiettivo di ripetizioni; se succede due
+chiudono *tutte* le serie in cima all'intervallo di ripetizioni. Se l'obiettivo
+non viene raggiunto, prima si abbassa l'obiettivo di ripetizioni; se succede due
 volte di fila, si toglie il 10% di carico, perché insistere su un peso che non
 si muove non allena, logora.
+
+**Quando l'obiettivo è raggiunto, cosa cresce dipende da cosa stai cercando.**
+Caricare più del necessario aggiunge rischio senza aggiungere risultato:
+
+| Obiettivo | Come si cresce |
+|---|---|
+| Forza, massa | Un gradino di carico (2,5 kg di bilanciere, 1-2 kg di manubrio, 5 kg di macchina) e si riparte dal fondo dell'intervallo |
+| Dimagrimento | Stesso carico, recupero più corto di 10 secondi fino a un minimo di 30; poi serie più lunghe; il peso sale solo quando non si fatica più nemmeno così |
+| Postura, mantenimento | Stesso carico e serie più lunghe, con un margine di 3-4 ripetizioni oltre il tetto prima di toccare il peso |
+| Ricomposizione | Via di mezzo: due ripetizioni di margine, poi il carico |
+
+Nel dimagrimento, se le pause accorciate fanno perdere ripetizioni, il
+programma restituisce prima il recupero e solo dopo valuta il carico: è la cosa
+meno costosa da ridare indietro.
 
 A corpo libero i chili non si possono aggiungere, quindi **il carico si cambia
 cambiando esercizio**: gli esercizi appartengono a scale di difficoltà
@@ -241,9 +253,11 @@ chiuso tutte le serie a 8 ripetizioni: si sale a 42,5 kg e si riparte da 6"*.
 npm run check:progressione
 ```
 
-Verifica dodici situazioni: prima volta, obiettivo raggiunto, obiettivo
+Verifica diciotto situazioni: prima volta, obiettivo raggiunto, obiettivo
 mancato una volta e due volte di fila, gradini diversi per manubri e bilancieri,
-storico scaduto, salita e discesa di variante a corpo libero, esercizi a tempo.
+storico scaduto, salita e discesa di variante a corpo libero, esercizi a tempo e
+il comportamento diverso di forza, dimagrimento e postura davanti allo stesso
+risultato.
 
 ## Note tecniche
 

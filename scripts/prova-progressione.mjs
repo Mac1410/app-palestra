@@ -23,7 +23,7 @@ const ORA = Date.UTC(2026, 9, 10);
 const esercizio = (id) => BUILTIN_EXERCISES.find((item) => item.id === id);
 
 /** Allenamento finto: un esercizio, N serie uguali. */
-function seduta({ exerciseId, weight, reps, giorniFa, serie = 3 }) {
+function seduta({ exerciseId, weight, reps, giorniFa, serie = 3, restSec = 120 }) {
   return {
     id: `s-${giorniFa}`,
     name: 'Prova',
@@ -33,7 +33,7 @@ function seduta({ exerciseId, weight, reps, giorniFa, serie = 3 }) {
       {
         id: 'ex1',
         exerciseId,
-        restSec: 120,
+        restSec,
         sets: Array.from({ length: serie }, (_, i) => ({
           id: `set-${i}`,
           weight,
@@ -129,6 +129,54 @@ const casi = [
     atteso: { esercizio: 'piegamenti-diamante', obiettivo: 10 },
   },
   {
+    nome: 'Dimagrire: obiettivo raggiunto, si accorcia il recupero invece di caricare',
+    goal: 'dimagrimento',
+    exerciseId: 'panca-piana',
+    target: { sets: 3, reps: '10-12', restSec: 60, weight: 30 },
+    storico: [seduta({ exerciseId: 'panca-piana', weight: 30, reps: 12, giorniFa: 3, restSec: 60 })],
+    atteso: { peso: 30, obiettivo: 12, recupero: 50 },
+  },
+  {
+    nome: 'Dimagrire: col recupero già al minimo si allunga la serie',
+    goal: 'dimagrimento',
+    exerciseId: 'panca-piana',
+    target: { sets: 3, reps: '10-12', restSec: 60, weight: 30 },
+    storico: [seduta({ exerciseId: 'panca-piana', weight: 30, reps: 12, giorniFa: 3, restSec: 30 })],
+    atteso: { peso: 30, obiettivo: 13, recupero: 30 },
+  },
+  {
+    nome: 'Dimagrire: esaurito anche il margine, allora il carico sale',
+    goal: 'dimagrimento',
+    exerciseId: 'panca-piana',
+    target: { sets: 3, reps: '10-12', restSec: 60, weight: 30 },
+    storico: [seduta({ exerciseId: 'panca-piana', weight: 30, reps: 16, giorniFa: 3, restSec: 30 })],
+    atteso: { peso: 32.5, obiettivo: 10 },
+  },
+  {
+    nome: 'Dimagrire: sotto obiettivo con pause corte, tornano le pause',
+    goal: 'dimagrimento',
+    exerciseId: 'panca-piana',
+    target: { sets: 3, reps: '10-12', restSec: 60, weight: 30 },
+    storico: [seduta({ exerciseId: 'panca-piana', weight: 30, reps: 8, giorniFa: 3, restSec: 40 })],
+    atteso: { peso: 30, obiettivo: 10, recupero: 50 },
+  },
+  {
+    nome: 'Postura: il carico resta, cresce la ripetizione',
+    goal: 'postura',
+    exerciseId: 'panca-piana',
+    target: { sets: 3, reps: '10-15', restSec: 45, weight: 25 },
+    storico: [seduta({ exerciseId: 'panca-piana', weight: 25, reps: 15, giorniFa: 3, restSec: 45 })],
+    atteso: { peso: 25, obiettivo: 16 },
+  },
+  {
+    nome: 'Forza: obiettivo raggiunto, carico subito più alto',
+    goal: 'forza',
+    exerciseId: 'squat',
+    target: { sets: 5, reps: '3-5', restSec: 180, weight: 60 },
+    storico: [seduta({ exerciseId: 'squat', weight: 60, reps: 5, giorniFa: 3, restSec: 180 })],
+    atteso: { peso: 62.5, obiettivo: 3 },
+  },
+  {
     nome: 'Esercizio a tempo: nessuna progressione di carico',
     exerciseId: 'plank',
     target: { sets: 3, reps: '40s', restSec: 45 },
@@ -145,6 +193,7 @@ for (const caso of casi) {
     catalog: BUILTIN_EXERCISES,
     target: caso.target,
     sessions: caso.storico,
+    goal: caso.goal ?? 'massa',
     now: ORA,
   });
 
@@ -153,6 +202,7 @@ for (const caso of casi) {
     esercizio: piano.exerciseId,
     peso: primaSerie.weight,
     obiettivo: primaSerie.targetReps,
+    recupero: piano.restSec,
   };
 
   const problemi = Object.entries(caso.atteso)
@@ -163,7 +213,7 @@ for (const caso of casi) {
 
   console.log(`\n${problemi.length === 0 ? '✓' : '✗'} ${caso.nome}`);
   console.log(
-    `    ${esito.esercizio} · ${esito.peso} kg × ${esito.obiettivo}${
+    `    ${esito.esercizio} · ${esito.peso} kg × ${esito.obiettivo} · rec ${esito.recupero}s${
       piano.sets[piano.sets.length - 1].toFailure ? ' (ultima a cedimento)' : ''
     }`,
   );

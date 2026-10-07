@@ -12,12 +12,20 @@
  * cambiando esercizio: ogni famiglia (piegamenti, trazioni, squat su una
  * gamba…) è una scala di difficoltà, e si sale o si scende di un gradino.
  *
+ * Ma *come* si cresce dipende dall'obiettivo, e non è un dettaglio. Per la
+ * forza il carico è il punto, e sale appena l'obiettivo è raggiunto. Per chi
+ * vuole dimagrire no: lì serve uno sforzo ripetuto e continuo, quindi prima si
+ * accorciano i recuperi e si allungano le serie, e il bilanciere si tocca solo
+ * quando il corpo ha smesso di faticare. Per la postura e il mantenimento vale
+ * lo stesso, con ancora meno fretta: caricare più del necessario aggiunge
+ * rischio senza aggiungere risultato.
+ *
  * Conta solo quello che è successo nelle ultime tre settimane: com'eri tre
  * mesi fa non dice più niente su che carico reggi oggi.
  */
 
 import { workingSets } from '@/lib/stats';
-import type { Exercise, Session, SetLog } from '@/types';
+import type { Exercise, Goal, Session, SetLog } from '@/types';
 
 /** Finestra di osservazione: oltre, l'allenamento non racconta più il presente. */
 export const RECENT_DAYS = 21;
@@ -43,6 +51,38 @@ export type ExercisePlan = {
 };
 
 export type RepRange = { min: number; max: number; timed: boolean };
+
+/**
+ * Come si cresce, obiettivo per obiettivo.
+ *
+ *  - `carico`: raggiunto il tetto di ripetizioni si aggiunge peso.
+ *  - `ripetizioni`: si allunga la serie e il peso resta dov'è, finché non si
+ *    supera anche il margine; solo allora si aggiunge un gradino.
+ *  - `densita`: si accorciano i recuperi a parità di carico — lo sforzo diventa
+ *    più fitto senza diventare più pesante.
+ */
+type GrowthStyle = 'carico' | 'ripetizioni' | 'densita';
+
+type Policy = {
+  crescita: GrowthStyle;
+  /** Ripetizioni concesse oltre il tetto prima di toccare il carico. */
+  margine: number;
+  /** Secondi tolti al recupero a ogni passo (solo per `densita`). */
+  passoRecupero: number;
+  /** Sotto questo recupero non si scende. */
+  recuperoMinimo: number;
+};
+
+export const GROWTH_POLICY: Record<Goal, Policy> = {
+  forza: { crescita: 'carico', margine: 0, passoRecupero: 0, recuperoMinimo: 120 },
+  massa: { crescita: 'carico', margine: 0, passoRecupero: 0, recuperoMinimo: 60 },
+  ricomposizione: { crescita: 'carico', margine: 2, passoRecupero: 0, recuperoMinimo: 45 },
+  dimagrimento: { crescita: 'densita', margine: 4, passoRecupero: 10, recuperoMinimo: 30 },
+  postura: { crescita: 'ripetizioni', margine: 4, passoRecupero: 0, recuperoMinimo: 45 },
+  mantenimento: { crescita: 'ripetizioni', margine: 3, passoRecupero: 0, recuperoMinimo: 60 },
+};
+
+const DEFAULT_POLICY = GROWTH_POLICY.massa;
 
 /** Legge "6-8", "10", "40s", "12 min". */
 export function parseRange(reps: string | undefined): RepRange {
@@ -77,6 +117,8 @@ type Attempt = {
   worstReps: number;
   bestReps: number;
   sets: number;
+  /** Recupero usato quella volta: serve a far crescere la densità. */
+  restSec: number;
 };
 
 function attemptFrom(session: Session, exerciseIds: Set<string>): Attempt | null {
@@ -90,6 +132,7 @@ function attemptFrom(session: Session, exerciseIds: Set<string>): Attempt | null
   return {
     exerciseId: entries[0].exerciseId,
     at: session.endedAt ?? session.startedAt,
+    restSec: entries[0].restSec,
     // Il carico di riferimento è il più usato nella seduta: la prima serie può
     // essere un avvicinamento e l'ultima un calo.
     weight: Math.max(...sets.map((set) => set.weight)),
@@ -114,12 +157,15 @@ export type PlanOptions = {
   target: { sets: number; reps?: string; restSec: number; weight?: number };
   /** Storico completo: viene filtrato qui alle ultime tre settimane. */
   sessions: Session[];
+  /** Decide se crescere di carico, di ripetizioni o di densità. */
+  goal?: Goal;
   now?: number;
 };
 
 export function planExercise(options: PlanOptions): ExercisePlan {
   const { exercise, catalog, target, sessions } = options;
   const now = options.now ?? Date.now();
+  const policy = options.goal ? GROWTH_POLICY[options.goal] : DEFAULT_POLICY;
 
   const range = parseRange(target.reps);
   const ladder = progressionLadder(exercise, catalog);
@@ -140,9 +186,10 @@ export function planExercise(options: PlanOptions): ExercisePlan {
     targetReps: number,
     advice: string | undefined,
     bodyweight: boolean,
+    restSec = target.restSec,
   ): ExercisePlan => ({
     exerciseId,
-    restSec: target.restSec,
+    restSec,
     targetReps: target.reps,
     advice,
     sets: Array.from({ length: Math.max(1, target.sets) }, (_, index) => ({
@@ -192,7 +239,9 @@ export function planExercise(options: PlanOptions): ExercisePlan {
     const harder = position >= 0 ? ladder[position + 1] : undefined;
     const easier = position > 0 ? ladder[position - 1] : undefined;
 
-    if (last.worstReps >= range.max && harder) {
+    const ceiling = range.max + policy.margine;
+
+    if (last.worstReps >= ceiling && harder) {
       return build(
         harder.id,
         0,
@@ -203,12 +252,14 @@ export function planExercise(options: PlanOptions): ExercisePlan {
     }
 
     if (last.worstReps >= range.max) {
-      const next = last.worstReps + 2;
+      const next = last.worstReps + 1;
       return build(
         last.exerciseId,
         0,
         next,
-        `Obiettivo alzato a ${next}: senza una variante più dura si cresce di ripetizioni.`,
+        harder
+          ? `Obiettivo alzato a ${next}: per il tuo obiettivo conta la ripetizione continua, non la difficoltà a tutti i costi.`
+          : `Obiettivo alzato a ${next}: senza una variante più dura si cresce di ripetizioni.`,
         true,
       );
     }
@@ -248,13 +299,44 @@ export function planExercise(options: PlanOptions): ExercisePlan {
   const step = loadStep(exercise, last.weight);
 
   if (last.worstReps >= range.max) {
+    const lastRest = last.restSec || target.restSec;
+
+    // Densità: lo sforzo cresce accorciando le pause, non caricando il bilanciere.
+    if (policy.crescita === 'densita' && lastRest > policy.recuperoMinimo) {
+      const rest = Math.max(policy.recuperoMinimo, lastRest - policy.passoRecupero);
+      return build(
+        exercise.id,
+        last.weight,
+        range.max,
+        `Stesso carico, recupero da ${rest} secondi invece di ${lastRest}: per dimagrire conta tenere alto lo sforzo, non alzare il peso.`,
+        false,
+        rest,
+      );
+    }
+
+    // Ripetizioni: si allunga la serie finché resta margine.
+    if (policy.crescita !== 'carico' && last.worstReps < range.max + policy.margine) {
+      const next = last.worstReps + 1;
+      return build(
+        exercise.id,
+        last.weight,
+        next,
+        `Obiettivo a ${next} ripetizioni, carico invariato: aumentarlo adesso non ti servirebbe.`,
+        false,
+        lastRest,
+      );
+    }
+
     const weight = round(last.weight + step, step);
     return build(
       exercise.id,
       weight,
       range.min,
-      `Hai chiuso tutte le serie a ${last.worstReps} ripetizioni: si sale a ${weight} kg e si riparte da ${range.min}.`,
+      policy.crescita === 'carico'
+        ? `Hai chiuso tutte le serie a ${last.worstReps} ripetizioni: si sale a ${weight} kg e si riparte da ${range.min}.`
+        : `Anche con le serie lunghe e le pause corte non fatichi più: ora un gradino di carico serve davvero, ${weight} kg.`,
       false,
+      policy.crescita === 'densita' ? lastRest : target.restSec,
     );
   }
 
@@ -266,6 +348,25 @@ export function planExercise(options: PlanOptions): ExercisePlan {
       next,
       `Stesso carico, una ripetizione in più: obiettivo ${next} per serie.`,
       false,
+    );
+  }
+
+  // Se si è rimasti sotto per via delle pause accorciate, le pause tornano
+  // prima di togliere carico: è la cosa meno costosa da restituire.
+  if (
+    policy.crescita === 'densita' &&
+    last.restSec > 0 &&
+    last.restSec < target.restSec &&
+    last.worstReps < range.min
+  ) {
+    const rest = Math.min(target.restSec, last.restSec + policy.passoRecupero);
+    return build(
+      exercise.id,
+      last.weight,
+      range.min,
+      `Recupero riportato a ${rest} secondi: le pause corte ti hanno fatto perdere ripetizioni, il carico resta lo stesso.`,
+      false,
+      rest,
     );
   }
 

@@ -316,6 +316,7 @@ export function GymProvider({ children }: { children: ReactNode }) {
             exercise,
             catalog,
             sessions: current.sessions,
+            goal: current.profile?.goal,
             target: {
               sets: options.sets ?? 3,
               reps: options.reps,
