@@ -81,9 +81,21 @@ export default function RoutinesScreen() {
         <EmptyState
           icon="clipboard-outline"
           title="Nessuna scheda"
-          message="Le schede sono i tuoi programmi: esercizi, serie e recuperi già pronti."
+          message={
+            state.profile
+              ? 'Le schede sono i tuoi programmi: esercizi, serie e recuperi già pronti.'
+              : 'Rispondi al questionario e le schede le costruisco io, su misura. Oppure creane una a mano.'
+          }
           action={
-            <Button label="Crea la prima" icon="add" onPress={() => router.push('/scheda/nuova')} />
+            state.profile ? (
+              <Button label="Crea la prima" icon="add" onPress={() => router.push('/scheda/nuova')} />
+            ) : (
+              <Button
+                label="Compila il questionario"
+                icon="sparkles"
+                onPress={() => router.push('/questionario')}
+              />
+            )
           }
         />
       ) : (

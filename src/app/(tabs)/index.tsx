@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Redirect, router } from 'expo-router';
+import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -65,8 +65,9 @@ export default function TodayScreen() {
     return `${delta > 0 ? '+' : ''}${delta}% vs settimana scorsa`;
   };
 
-  // Primo avvio: prima di tutto il questionario, poi l'app vera e propria.
-  if (ready && !state.profile) return <Redirect href="/questionario" />;
+  // Al primo avvio non si salta alle domande: si entra in casa propria, e il
+  // questionario è un invito che sta dove un giorno staranno le schede.
+  const senzaProgramma = ready && !state.profile;
 
   return (
     <View style={styles.root}>
@@ -133,6 +134,7 @@ export default function TodayScreen() {
             </Card>
           ) : null}
 
+          {senzaProgramma ? null : (
           <Card>
             <View style={styles.rowBetween}>
               <View style={styles.flexShrink}>
@@ -178,8 +180,27 @@ export default function TodayScreen() {
               })}
             </View>
           </Card>
+          )}
 
-          {suggested ? (
+          {senzaProgramma ? (
+            <Card accent>
+              <ThemedText type="captionBold" themeColor="accent">
+                PER COMINCIARE
+              </ThemedText>
+              <ThemedText type="heading">Costruiamo il tuo programma</ThemedText>
+              <ThemedText type="small" themeColor="textSecondary">
+                Nove domande veloci — obiettivo, giorni, quanto tempo hai, dove ti alleni — e da
+                lì costruisco le schede su misura, con esercizi, serie e carichi di partenza.
+              </ThemedText>
+              <Button
+                label="Compila il questionario"
+                icon="sparkles"
+                full
+                style={styles.heroAction}
+                onPress={() => router.push('/questionario')}
+              />
+            </Card>
+          ) : suggested ? (
             <View style={styles.tiles}>
               <EmberTile
                 title={suggested.name}
@@ -211,7 +232,7 @@ export default function TodayScreen() {
 
           <Button
             label="Allenamento libero"
-            variant="secondary"
+            variant={senzaProgramma ? 'ghost' : 'secondary'}
             icon="flash-outline"
             full
             onPress={() => startRoutine()}
@@ -339,5 +360,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   tiles: { flexDirection: 'row', gap: Spacing.two + 4 },
+  heroAction: { marginTop: Spacing.two },
   sectionLabel: { marginTop: Spacing.two },
 });
