@@ -1,0 +1,212 @@
+<title>Palestra su iPhone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+  /* Tema unico scuro, coerente con la direzione Ember dell'app. */
+  :root{
+    --bg:#0B0A0A;
+    --panel:#1A1819;
+    --line:#232021;
+    --ink:#F3F1ED;
+    --muted:#8B8583;
+    --dim:#6F6967;
+    --accent:#FF6B2C;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(74% 42% at 50% -6%, rgba(255,92,26,.30) 0%, transparent 62%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Archivo','Helvetica Neue',Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    display:flex;
+    justify-content:center;
+    padding:56px 20px 72px;
+  }
+  .col{width:100%;max-width:560px;display:flex;flex-direction:column;gap:30px;}
+
+  header{display:flex;flex-direction:column;gap:10px;text-align:center;}
+  .eyebrow{
+    margin:0;font-family:'IBM Plex Mono',ui-monospace,monospace;
+    font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);
+  }
+  h1{
+    margin:0;font-size:clamp(30px,7vw,42px);line-height:1.04;font-weight:800;
+    font-variation-settings:'wdth' 112;letter-spacing:-.025em;text-wrap:balance;
+  }
+  header p{margin:0;color:var(--muted);font-size:15.5px;line-height:1.55;}
+
+  .plate{
+    background:#FFFFFF;border-radius:22px;padding:26px;
+    display:flex;flex-direction:column;align-items:center;gap:18px;
+    box-shadow:0 26px 60px rgba(0,0,0,.5);
+  }
+  #qr{display:flex;align-items:center;justify-content:center;min-height:240px;}
+  #qr img,#qr canvas{display:block;}
+  .plate .note{
+    margin:0;color:#5A5551;font-size:12.5px;text-align:center;
+    font-family:'IBM Plex Mono',monospace;letter-spacing:.04em;
+  }
+
+  .url{
+    display:flex;align-items:center;justify-content:space-between;gap:14px;
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:15px 18px;
+  }
+  .url code{
+    font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:15px;color:var(--accent);
+    user-select:all;word-break:break-all;
+  }
+  .url button{
+    appearance:none;cursor:pointer;flex:none;
+    background:transparent;border:1px solid var(--line);border-radius:999px;
+    color:var(--muted);font:inherit;font-size:12px;padding:7px 13px;
+    transition:color .15s ease,border-color .15s ease;
+  }
+  .url button:hover{color:var(--accent);border-color:var(--accent);}
+  .url button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:2px;counter-reset:step;}
+  ol li{
+    counter-increment:step;
+    display:grid;grid-template-columns:34px 1fr;gap:14px;align-items:start;
+    padding:16px 0;border-bottom:1px solid var(--line);
+  }
+  ol li:last-child{border-bottom:0;}
+  ol li::before{
+    content:counter(step,decimal-leading-zero);
+    font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent);padding-top:3px;
+  }
+  ol b{display:block;font-size:16.5px;font-weight:700;letter-spacing:-.01em;margin-bottom:3px;}
+  ol span{color:var(--muted);font-size:14.5px;line-height:1.55;}
+
+  .box{
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px 22px;
+    display:flex;flex-direction:column;gap:12px;
+  }
+  .box h2{
+    margin:0;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--dim);font-weight:500;
+  }
+  .box p{margin:0;color:var(--muted);font-size:14.5px;line-height:1.6;}
+  .box p b{color:var(--ink);font-weight:600;}
+  .box code{
+    font-family:'IBM Plex Mono',monospace;font-size:13.5px;color:var(--accent);
+  }
+</style>
+
+<div class="col">
+  <header>
+    <p class="eyebrow">Server attivo · in attesa di connessione</p>
+    <h1>Apri Palestra sul tuo iPhone</h1>
+    <p>Inquadra il codice con la fotocamera del telefono: si apre Expo Go e l'app parte.</p>
+  </header>
+
+  <div class="plate">
+    <div id="qr"></div>
+    <p class="note">exp://192.168.1.191:8081</p>
+  </div>
+
+  <div class="url">
+    <code id="link">exp://192.168.1.191:8081</code>
+    <button type="button" id="copy">Copia</button>
+  </div>
+
+  <ol>
+    <li>
+      <div>
+        <b>Installa Expo Go</b>
+        <span>Cercala nell'App Store, è gratuita. Basta averla installata: non serve creare un account.</span>
+      </div>
+    </li>
+    <li>
+      <div>
+        <b>Metti l'iPhone sulla stessa Wi-Fi del PC</b>
+        <span>La rete deve essere quella dei numeri 192.168.1.x. Se il telefono è sotto rete dati o su un'altra Wi-Fi, non trova il computer.</span>
+      </div>
+    </li>
+    <li>
+      <div>
+        <b>Inquadra il codice qui sopra</b>
+        <span>Con la normale app Fotocamera. Compare una notifica in alto: toccala e si apre Expo Go. In alternativa apri Expo Go, tocca “Enter URL manually” e incolla l'indirizzo.</span>
+      </div>
+    </li>
+  </ol>
+
+  <div class="box">
+    <h2>Se non si collega</h2>
+    <p>
+      Il primo caricamento impiega un minuto: Metro deve compilare tutto il pacchetto.
+      La schermata resta bianca fino alla fine, è normale.
+    </p>
+    <p>
+      Se resta bloccata o dà errore di rete, quasi sempre è il <b>firewall di Windows</b> che
+      blocca Node. Quando compare la richiesta, scegli <b>Consenti accesso</b> sulle reti private.
+    </p>
+    <p>
+      Se la Wi-Fi separa i dispositivi fra loro — capita con le reti ospiti e in molti uffici —
+      la strada alternativa passa da internet: <code>npx expo start --tunnel</code>, che genera
+      un indirizzo diverso, più lento ma indipendente dalla rete locale.
+    </p>
+  </div>
+
+  <div class="box">
+    <h2>Attenzione</h2>
+    <p>
+      L'indirizzo funziona solo <b>mentre il server è acceso sul PC</b> e finché il computer
+      resta sulla stessa Wi-Fi. Spento il server, l'app sul telefono non si apre più: è il
+      normale funzionamento dello sviluppo, non un guasto.
+    </p>
+  </div>
+</div>
+
+<script>
+(function () {
+  var url = 'exp://192.168.1.191:8081';
+  var target = document.getElementById('qr');
+
+  if (typeof QRCode === 'function') {
+    new QRCode(target, {
+      text: url,
+      width: 240,
+      height: 240,
+      colorDark: '#0B0A0A',
+      colorLight: '#FFFFFF',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  } else {
+    target.textContent = 'Codice non disponibile: usa l’indirizzo qui sotto.';
+    target.style.color = '#5A5551';
+    target.style.fontSize = '14px';
+    target.style.textAlign = 'center';
+  }
+
+  var button = document.getElementById('copy');
+  button.addEventListener('click', function () {
+    var done = function () {
+      button.textContent = 'Copiato';
+      setTimeout(function () { button.textContent = 'Copia'; }, 1800);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(done, select);
+    } else {
+      select();
+    }
+    function select() {
+      var range = document.createRange();
+      range.selectNodeContents(document.getElementById('link'));
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      button.textContent = 'Seleziona e copia';
+      setTimeout(function () { button.textContent = 'Copia'; }, 2400);
+    }
+  });
+})();
+</script>
