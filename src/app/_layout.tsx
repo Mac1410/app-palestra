@@ -48,6 +48,8 @@ export default function RootLayout() {
               options={{ title: 'Nuovo esercizio', presentation: 'modal' }}
             />
             <Stack.Screen name="impostazioni" options={{ title: 'Impostazioni' }} />
+            <Stack.Screen name="questionario" options={{ headerShown: false }} />
+            <Stack.Screen name="programma" options={{ title: 'Programma' }} />
           </Stack>
         </DialogProvider>
       </ThemeProvider>

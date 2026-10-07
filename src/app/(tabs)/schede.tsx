@@ -94,7 +94,14 @@ export default function RoutinesScreen() {
             onLongPress={() => openActions(routine.id, routine.name)}>
             <View style={styles.rowBetween}>
               <View style={styles.flexShrink}>
-                <ThemedText type="subtitle">{routine.name}</ThemedText>
+                <View style={styles.titleRow}>
+                  <ThemedText type="subtitle">{routine.name}</ThemedText>
+                  {routine.generated ? (
+                    <ThemedText type="captionBold" themeColor="accent">
+                      PROGRAMMA
+                    </ThemedText>
+                  ) : null}
+                </View>
                 {routine.description ? (
                   <ThemedText type="small" themeColor="textSecondary">
                     {routine.description}
@@ -132,6 +139,7 @@ export default function RoutinesScreen() {
 }
 
 const styles = StyleSheet.create({
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two, flexWrap: 'wrap' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

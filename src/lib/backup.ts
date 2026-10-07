@@ -15,7 +15,10 @@ const FORMAT = 'palestra-backup';
 const FORMAT_VERSION = 1;
 
 /** Parte dello stato che vale la pena conservare (la sessione in corso no). */
-export type BackupData = Pick<GymState, 'customExercises' | 'routines' | 'sessions' | 'settings'>;
+export type BackupData = Pick<
+  GymState,
+  'customExercises' | 'routines' | 'sessions' | 'settings' | 'profile' | 'program'
+>;
 
 type BackupFile = {
   format: typeof FORMAT;
@@ -30,6 +33,8 @@ export function buildBackup(state: GymState): string {
     version: FORMAT_VERSION,
     exportedAt: new Date().toISOString(),
     data: {
+      profile: state.profile,
+      program: state.program,
       customExercises: state.customExercises,
       routines: state.routines,
       sessions: state.sessions,
@@ -174,6 +179,9 @@ export function parseBackup(text: string): BackupData {
   }
 
   return {
+    // I backup creati prima del questionario non hanno profilo né programma.
+    profile: data.profile ?? null,
+    program: data.program ?? null,
     customExercises: data.customExercises,
     routines: data.routines,
     sessions: data.sessions,

@@ -42,7 +42,8 @@
     "lint": "expo lint",
     "build:web": "node scripts/build-web.mjs",
     "serve:web": "node scripts/serve-dist.mjs",
-    "deploy:web": "node scripts/deploy-pages.mjs"
+    "deploy:web": "node scripts/deploy-pages.mjs",
+    "check:plan": "node scripts/prova-programmi.mjs"
   },
   "private": true
 }

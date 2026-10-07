@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 
@@ -20,11 +21,12 @@ import {
 import { formatVolume } from '@/lib/format';
 import { sessionVolume } from '@/lib/stats';
 import { useGym } from '@/store/gym-store';
+import { GOAL_LABELS, SPLIT_LABELS } from '@/types';
 
 export default function SettingsScreen() {
   const { state, actions } = useGym();
   const dialog = useDialog();
-  const { settings, sessions, routines, customExercises } = state;
+  const { settings, sessions, routines, customExercises, profile, program } = state;
   const [busy, setBusy] = useState(false);
 
   const confirmReset = async () => {
@@ -91,6 +93,57 @@ export default function SettingsScreen() {
 
   return (
     <Screen>
+      <SectionHeader title="Il tuo programma" />
+      <Card>
+        {profile ? (
+          <>
+            <View style={styles.statRow}>
+              <ThemedText type="small">Obiettivo</ThemedText>
+              <ThemedText type="smallBold">{GOAL_LABELS[profile.goal].title}</ThemedText>
+            </View>
+            <View style={styles.statRow}>
+              <ThemedText type="small">Suddivisione</ThemedText>
+              <ThemedText type="smallBold">
+                {program ? SPLIT_LABELS[program.split] : '—'}
+              </ThemedText>
+            </View>
+            <View style={styles.statRow}>
+              <ThemedText type="small">Disponibilità</ThemedText>
+              <ThemedText type="smallBold">
+                {profile.daysPerWeek}× {profile.sessionMinutes} min
+              </ThemedText>
+            </View>
+            <Button
+              label="Vedi il programma"
+              icon="sparkles-outline"
+              variant="secondary"
+              full
+              style={styles.secondAction}
+              onPress={() => router.push('/programma')}
+            />
+            <Button
+              label="Rifai il questionario"
+              variant="ghost"
+              full
+              onPress={() => router.push('/questionario')}
+            />
+          </>
+        ) : (
+          <>
+            <ThemedText type="small" themeColor="textSecondary">
+              Non hai ancora un programma: rispondi a qualche domanda e lo costruisco io.
+            </ThemedText>
+            <Button
+              label="Compila il questionario"
+              icon="sparkles"
+              full
+              style={styles.secondAction}
+              onPress={() => router.push('/questionario')}
+            />
+          </>
+        )}
+      </Card>
+
       <SectionHeader title="Allenamento" />
       <Card>
         <View style={styles.row}>

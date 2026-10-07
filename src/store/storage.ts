@@ -13,6 +13,8 @@ export async function loadState(): Promise<GymState | null> {
     return {
       ...EMPTY_STATE,
       ...parsed,
+      profile: parsed.profile ?? null,
+      program: parsed.program ?? null,
       customExercises: parsed.customExercises ?? [],
       routines: parsed.routines ?? [],
       sessions: parsed.sessions ?? [],

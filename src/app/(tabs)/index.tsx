@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { Redirect, router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -32,7 +32,7 @@ import { useGym } from '@/store/gym-store';
 export default function TodayScreen() {
   const { width } = useWindowDimensions();
   const { state, ready, actions, getRoutine } = useGym();
-  const { sessions, routines, activeSession, settings } = state;
+  const { sessions, routines, activeSession, settings, program } = state;
 
   const weekStart = startOfWeek(Date.now());
   const weekSessions = sessionsInWeek(sessions, weekStart);
@@ -44,10 +44,11 @@ export default function TodayScreen() {
   const delta =
     previousVolume > 0 ? Math.round(((weekVolume - previousVolume) / previousVolume) * 100) : null;
 
-  const suggestedId = suggestedRoutineId(
-    sessions,
-    routines.map((r) => r.id),
+  // Con un programma attivo la rotazione resta dentro le sue sedute.
+  const rotation = (program?.routineIds ?? routines.map((r) => r.id)).filter((id) =>
+    routines.some((routine) => routine.id === id),
   );
+  const suggestedId = suggestedRoutineId(sessions, rotation);
   const suggested = suggestedId ? getRoutine(suggestedId) : undefined;
   const recent = sessions.slice(0, 3);
 
@@ -63,6 +64,9 @@ export default function TodayScreen() {
     if (delta === 0) return 'In linea con la settimana scorsa';
     return `${delta > 0 ? '+' : ''}${delta}% vs settimana scorsa`;
   };
+
+  // Primo avvio: prima di tutto il questionario, poi l'app vera e propria.
+  if (ready && !state.profile) return <Redirect href="/questionario" />;
 
   return (
     <View style={styles.root}>

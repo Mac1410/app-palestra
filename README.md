@@ -78,6 +78,17 @@ Dettagli tecnici della web app:
 
 ## Cosa fa l'app
 
+**Questionario** — al primo avvio l'app non mostra schede d'esempio: chiede
+obiettivo, esperienza, giorni e minuti a disposizione, dove ci si allena e con
+quale attrezzatura, zone del corpo da trattare con cura, priorità e cardio. Da
+quelle risposte nasce il programma. Si rifà quando si vuole da Impostazioni.
+
+**Programma** — le schede costruite su misura, con la spiegazione delle scelte:
+quale suddivisione (full body, upper/lower, push-pull-legs, circuito a corpo
+libero) e perché, come sono stati scelti serie, ripetizioni e recuperi, cosa è
+stato escluso per via delle limitazioni dichiarate. Le schede restano
+modificabili come tutte le altre.
+
 **Oggi** — il volume della settimana come numero protagonista dentro l'anello di
 brace, con il confronto sulla settimana precedente; sotto, avanzamento verso
 l'obiettivo con il calendario dei sette giorni, scheda consigliata (la meno
@@ -89,7 +100,7 @@ ripetizioni obiettivo e recupero. Tocco lungo su una scheda per duplicarla o
 eliminarla. Al primo avvio trovi quattro schede di esempio (Full body A, Push,
 Pull, Legs) che puoi modificare o cancellare.
 
-**Esercizi** — catalogo di 68 esercizi con ricerca e filtro per gruppo
+**Esercizi** — catalogo di 100 esercizi con ricerca e filtro per gruppo
 muscolare, più i tuoi esercizi personalizzati. La scheda di dettaglio mostra
 record di carico, 1RM stimato, andamento e storico completo.
 
@@ -136,19 +147,60 @@ src/
     sessione.tsx          allenamento in corso
     aggiungi-esercizi.tsx selezione multipla (scheda o sessione)
     nuovo-esercizio.tsx   creazione esercizio personalizzato
+    questionario.tsx      domande iniziali, una per schermata
+    programma.tsx         il programma generato e le sue motivazioni
     impostazioni.tsx
   components/             UI riutilizzabile (Card, Button, Chip, grafici…)
   constants/theme.ts      palette Ember, spaziature, raggi
   data/exercises.ts       catalogo di base e schede di esempio
   hooks/                  tema e feedback aptico
-  lib/                    formattazione italiana, calcoli (volume, 1RM, streak), backup
+  lib/                    formattazione italiana, calcoli (volume, 1RM, streak),
+                          backup e generatore del programma (plan.ts)
   store/                  stato globale (reducer) e persistenza AsyncStorage
   types/                  modello dati
 scripts/
   build-web.mjs           costruisce la web app installabile
   serve-dist.mjs          la prova in locale come se fosse online
   deploy-pages.mjs        la pubblica su GitHub Pages
+  prova-programmi.mjs     genera i programmi di quindici profili e li controlla
 ```
+
+## Come nasce il programma
+
+`src/lib/plan.ts` costruisce le schede dalle risposte del questionario. Il
+criterio è che una seduta equilibrata nasce dagli *schemi di movimento*
+(spingere, tirare, accosciare, piegare l'anca, core), non dai muscoli presi uno
+per uno: ogni esercizio del catalogo porta con sé schema, ruolo (fondamentale,
+complementare, isolamento), zone che sollecita e attrezzi richiesti.
+
+Le decisioni, in ordine:
+
+1. **Cosa è possibile** — a casa restano solo gli esercizi fattibili con
+   l'attrezzatura dichiarata; le zone delicate escludono gli esercizi che le
+   caricano, e il generatore ripiega su alternative dello stesso schema.
+2. **La suddivisione** — più sedute brevi significano meno tempo per volta,
+   quindi conviene dividere il corpo; poche sedute lunghe chiedono il
+   contrario. Da qui full body, upper/lower, push-pull-legs o circuito.
+3. **Il tempo** — ogni seduta viene stimata in minuti e fatta rientrare nella
+   durata dichiarata. Le rinunce seguono un ordine: prima i complementi, poi le
+   serie, poi i recuperi (mai sotto una soglia, o l'allenamento cambia natura),
+   e solo alla fine un esercizio. Sotto i tre esercizi non si scende. Se invece
+   avanza tempo, la seduta viene completata con lavoro coerente col suo tema.
+4. **L'obiettivo** — decide serie, ripetizioni e recuperi, e il cardio si
+   prenota il suo tempo prima che se lo mangino i pesi.
+
+I carichi di partenza sono proposti in frazioni del peso corporeo, prudenti e
+pensati per essere corretti subito.
+
+Per verificare il generatore dopo una modifica:
+
+```bash
+npm run check:plan
+```
+
+Stampa le schede di quindici profili diversi e fallisce se una seduta sfora il
+tempo, ripete un esercizio, ne usa uno vietato dalle limitazioni o richiede un
+attrezzo che a casa non c'è.
 
 ## Note tecniche
 

@@ -9,15 +9,18 @@ import {
   type ReactNode,
 } from 'react';
 
-import { BUILTIN_EXERCISES, STARTER_ROUTINES } from '@/data/exercises';
+import { BUILTIN_EXERCISES } from '@/data/exercises';
 import { type BackupData } from '@/lib/backup';
 import { createId } from '@/lib/id';
+import { buildProgram } from '@/lib/plan';
 import { lastPerformance } from '@/lib/stats';
 import { clearState, loadState, saveState } from '@/store/storage';
 import {
   EMPTY_STATE,
   type Exercise,
   type GymState,
+  type Profile,
+  type Program,
   type Routine,
   type RoutineExercise,
   type Session,
@@ -45,6 +48,8 @@ type Action =
   | { type: 'session/patch-set'; sessionExerciseId: string; setId: string; patch: Partial<SetLog> }
   | { type: 'history/delete'; id: string }
   | { type: 'settings/update'; patch: Partial<Settings> }
+  | { type: 'profile/save'; profile: Profile }
+  | { type: 'program/apply'; program: Program; routines: Routine[] }
   | { type: 'data/import'; data: BackupData }
   | { type: 'data/reset' };
 
@@ -182,6 +187,18 @@ function reducer(state: GymState, action: Action): GymState {
     case 'settings/update':
       return { ...state, settings: { ...state.settings, ...action.patch } };
 
+    case 'profile/save':
+      return { ...state, profile: action.profile };
+
+    case 'program/apply':
+      // Le schede generate in precedenza vengono sostituite; quelle create a
+      // mano dall'utente restano dove sono.
+      return {
+        ...state,
+        program: action.program,
+        routines: [...action.routines, ...state.routines.filter((r) => !r.generated)],
+      };
+
     case 'data/import':
       // Il backup sostituisce i dati: un'eventuale sessione in corso viene chiusa.
       return { ...EMPTY_STATE, ...action.data, activeSession: null };
@@ -192,25 +209,6 @@ function reducer(state: GymState, action: Action): GymState {
     default:
       return state;
   }
-}
-
-/** Schede di esempio, create solo al primissimo avvio. */
-function seedRoutines(): Routine[] {
-  const now = Date.now();
-  return STARTER_ROUTINES.map((template, index) => ({
-    id: createId('routine'),
-    name: template.name,
-    description: template.description,
-    createdAt: now + index,
-    updatedAt: now + index,
-    exercises: template.exercises.map((e) => ({
-      id: createId('rex'),
-      exerciseId: e.exerciseId,
-      sets: e.sets,
-      reps: e.reps,
-      restSec: e.restSec,
-    })),
-  }));
 }
 
 type GymContextValue = {
@@ -243,6 +241,10 @@ type GymContextValue = {
     cancelSession: () => void;
     deleteSessionFromHistory: (id: string) => void;
     updateSettings: (patch: Partial<Settings>) => void;
+    /** Salva le risposte del questionario e costruisce il programma. */
+    saveProfile: (profile: Profile) => void;
+    /** Ricostruisce le schede dal profilo già salvato. */
+    regenerateProgram: () => void;
     importData: (data: BackupData) => void;
     resetAllData: () => Promise<void>;
   };
@@ -262,10 +264,8 @@ export function GymProvider({ children }: { children: ReactNode }) {
     (async () => {
       const stored = await loadState();
       if (cancelled) return;
-      dispatch({
-        type: 'hydrate',
-        state: stored ?? { ...EMPTY_STATE, routines: seedRoutines() },
-      });
+      // Al primo avvio non si inventano schede: le crea il questionario.
+      dispatch({ type: 'hydrate', state: stored ?? EMPTY_STATE });
       setReady(true);
     })();
     return () => {
@@ -320,6 +320,12 @@ export function GymProvider({ children }: { children: ReactNode }) {
           };
         }),
       };
+    };
+
+    const applyProgram = (profile: Profile) => {
+      const catalog = [...BUILTIN_EXERCISES, ...stateRef.current.customExercises];
+      const { program, routines } = buildProgram(profile, catalog);
+      dispatch({ type: 'program/apply', program, routines });
     };
 
     const actions: GymContextValue['actions'] = {
@@ -388,6 +394,16 @@ export function GymProvider({ children }: { children: ReactNode }) {
       cancelSession: () => dispatch({ type: 'session/cancel' }),
       deleteSessionFromHistory: (id) => dispatch({ type: 'history/delete', id }),
       updateSettings: (patch) => dispatch({ type: 'settings/update', patch }),
+      saveProfile: (profile) => {
+        dispatch({ type: 'profile/save', profile });
+        applyProgram(profile);
+        // L'obiettivo settimanale segue la disponibilità dichiarata.
+        dispatch({ type: 'settings/update', patch: { weeklyGoal: profile.daysPerWeek } });
+      },
+      regenerateProgram: () => {
+        const profile = stateRef.current.profile;
+        if (profile) applyProgram(profile);
+      },
       importData: (data) => dispatch({ type: 'data/import', data }),
       resetAllData: async () => {
         dispatch({ type: 'data/reset' });
