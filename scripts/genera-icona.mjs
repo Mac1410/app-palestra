@@ -37,7 +37,7 @@ const mix = (sotto, sopra, alpha) => [
   sotto[2] + (sopra[2] - sotto[2]) * alpha,
 ];
 
-/** Sfumatura fra i tre colori dell'anello, con t da 0 a 1. */
+/** Sfumatura fra i tre colori dell'anello: t è la distanza dall'alto, da 0 a 1. */
 function coloreAnello(t) {
   const scala = Math.min(0.999, Math.max(0, t)) * (ANELLO.length - 1);
   const i = Math.floor(scala);
@@ -79,15 +79,16 @@ function colorePunto(x, y) {
     let angolo = (Math.atan2(y - cy, x - cx) * 180) / Math.PI;
     if (angolo < 0) angolo += 360;
 
-    // L'anello corre da 110° fino a 55° passando dal basso: l'apertura in alto
-    // a destra è il respiro che tiene viva la forma.
-    const percorso = (angolo - 110 + 360) % 360;
-    const lunghezza = 305;
+    // Distanza angolare dal punto più alto dell'anello. Misurare da lì, e non
+    // lungo il percorso, è ciò che rende i due lati speculari: l'apertura resta
+    // centrata in basso e i colori si specchiano a destra e a sinistra.
+    const dallAlto = Math.abs(((angolo - 270 + 540) % 360) - 180);
+    const arco = 155; // metà anello: l'apertura in basso misura 50 gradi
 
-    if (percorso <= lunghezza) {
-      const t = percorso / lunghezza;
-      // Sfuma agli estremi, così l'anello non sembra tagliato di netto.
-      const sfumatura = Math.min(1, Math.min(t, 1 - t) * 14);
+    if (dallAlto <= arco) {
+      const t = dallAlto / arco;
+      // Sfuma ai due estremi, così l'anello non sembra tagliato di netto.
+      const sfumatura = Math.min(1, (1 - t) * 14);
       // Bordo morbido anche sullo spessore.
       const bordo = Math.min(1, (spessore / 2 - scostamento) / 2.5);
       colore = mix(colore, coloreAnello(t), sfumatura * bordo);
