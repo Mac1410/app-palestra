@@ -1,6 +1,7 @@
 /** Modello dati dell'app. Tutto viene persistito in locale (AsyncStorage). */
 
 export const MUSCLE_GROUPS = [
+  'Collo',
   'Petto',
   'Dorso',
   'Spalle',
@@ -43,6 +44,7 @@ export const MOVEMENT_PATTERNS = [
   'core',
   'isolamento',
   'mobilita',
+  'allungamento',
   'cardio',
 ] as const;
 
@@ -93,6 +95,13 @@ export type Exercise = {
    * aggiungere chili, si sale di livello passando a una variante più dura.
    */
   progression?: { family: string; level: number };
+  /** Muscoli che questo allungamento scioglie, per abbinarlo alla seduta. */
+  stretchFor?: MuscleGroup[];
+  /**
+   * Esercizio del blocco posturale: la catena che si accorcia stando curvi
+   * davanti a uno schermo, e che produce la gobba alla base del collo.
+   */
+  posturalFocus?: 'collo-spalle';
 };
 
 /** Riga di una scheda: esercizio + parametri obiettivo. */
@@ -147,6 +156,8 @@ export type SessionExercise = {
    * questa variante: scritto in italiano e mostrato sotto il nome.
    */
   advice?: string;
+  /** Gli esercizi di defaticamento stanno in coda e non contano nei numeri. */
+  phase?: 'stretching';
 };
 
 export type Session = {
@@ -167,6 +178,8 @@ export type Settings = {
   autoRest: boolean;
   haptics: boolean;
   defaultRestSec: number;
+  /** Coda di allungamento a fine allenamento. Spenta finché non la chiedi. */
+  stretching: boolean;
 };
 
 // ---------------------------------------------------------------------------
@@ -299,6 +312,7 @@ export const DEFAULT_SETTINGS: Settings = {
   autoRest: true,
   haptics: true,
   defaultRestSec: 90,
+  stretching: false,
 };
 
 export const EMPTY_STATE: GymState = {

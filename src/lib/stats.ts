@@ -1,8 +1,12 @@
 import { addDays, startOfDay, startOfWeek } from '@/lib/format';
 import type { Exercise, MuscleGroup, Session, SessionExercise, SetLog } from '@/types';
 
-/** Serie che contano per volume e record: completate e non di riscaldamento. */
+/**
+ * Serie che contano per volume e record: completate, non di riscaldamento e
+ * non di defaticamento — l'allungamento non è lavoro, è recupero.
+ */
 export function workingSets(exercise: SessionExercise): SetLog[] {
+  if (exercise.phase === 'stretching') return [];
   return exercise.sets.filter((s) => s.done && !s.warmup && s.reps > 0);
 }
 

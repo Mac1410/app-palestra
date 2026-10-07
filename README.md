@@ -100,7 +100,7 @@ ripetizioni obiettivo e recupero. Tocco lungo su una scheda per duplicarla o
 eliminarla. Al primo avvio trovi quattro schede di esempio (Full body A, Push,
 Pull, Legs) che puoi modificare o cancellare.
 
-**Esercizi** — catalogo di 106 esercizi con ricerca e filtro per gruppo
+**Esercizi** — catalogo di 121 esercizi con ricerca e filtro per gruppo
 muscolare, più i tuoi esercizi personalizzati. La scheda di dettaglio mostra
 record di carico, 1RM stimato, andamento e storico completo.
 
@@ -108,8 +108,9 @@ record di carico, 1RM stimato, andamento e storico completo.
 ultime 8 settimane, ripartizione per gruppo muscolare degli ultimi 30 giorni e
 storico di tutti gli allenamenti.
 
-**Impostazioni** — obiettivo settimanale, recupero predefinito, backup dei dati
-(esportazione e reimportazione del file JSON) e cancellazione completa.
+**Impostazioni** — obiettivo settimanale, recupero predefinito, stretching
+finale, backup dei dati (esportazione e reimportazione del file JSON) e
+cancellazione completa.
 
 **Allenamento in corso** — cronometro, volume e serie in tempo reale; per ogni
 esercizio una griglia kg × ripetizioni con l'obiettivo della singola serie
@@ -157,8 +158,9 @@ src/
   data/exercises.ts       catalogo di base e schede di esempio
   hooks/                  tema e feedback aptico
   lib/                    formattazione italiana, calcoli (volume, 1RM, streak),
-                          backup, generatore del programma (plan.ts) e
-                          progressione dei carichi (progression.ts)
+                          backup, generatore del programma (plan.ts),
+                          progressione dei carichi (progression.ts) e
+                          defaticamento (stretching.ts)
   store/                  stato globale (reducer) e persistenza AsyncStorage
   types/                  modello dati
 scripts/
@@ -211,6 +213,24 @@ npm run check:plan
 Stampa le schede di diciannove profili diversi e fallisce se una seduta sfora il
 tempo, ripete un esercizio, ne usa uno vietato dalle limitazioni o richiede un
 attrezzo che a casa non c'è.
+
+## Stretching finale (opzionale)
+
+Spento di default; si accende da Impostazioni. Quando è attivo, ogni
+allenamento finisce con cinque posizioni da trenta secondi, messe in coda e
+tenute fuori da volume, serie e record — l'allungamento non è lavoro.
+
+La scelta (`src/lib/stretching.ts`) mette insieme due cose: gli allungamenti
+dei **muscoli allenati quel giorno**, presi in ordine di quanto sono stati
+usati, e un **blocco fisso per collo e spalle**, che c'è sempre.
+
+Il blocco posturale esiste perché la gobba alla base del collo non nasce in
+palestra ma davanti a uno schermo: la testa va avanti, pettorali ed elevatore
+della scapola si accorciano, il tratto alto della schiena resta curvo e i
+flessori profondi del collo smettono di lavorare. Quindi si allunga ciò che si
+è accorciato — pettorali sullo stipite, elevatore della scapola — si riapre il
+torace con l'estensione toracica su un asciugamano arrotolato, e si risveglia
+ciò che ha mollato con la retrazione del capo.
 
 ## Come cresce il carico
 

@@ -189,6 +189,13 @@ export default function SettingsScreen() {
           onChange={(value) => actions.updateSettings({ autoRest: value })}
         />
 
+        <Toggle
+          label="Stretching finale"
+          description="Aggiunge in coda 5 minuti di allungamento: i muscoli allenati più collo e spalle, contro la postura curva"
+          value={settings.stretching}
+          onChange={(value) => actions.updateSettings({ stretching: value })}
+        />
+
         {Platform.OS !== 'web' ? (
           <Toggle
             label="Vibrazione"

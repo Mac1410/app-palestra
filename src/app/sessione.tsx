@@ -69,7 +69,10 @@ export default function SessionScreen() {
 
   const totalVolume = session.exercises.reduce((sum, e) => sum + exerciseVolume(e), 0);
   const doneSets = session.exercises.reduce((sum, e) => sum + workingSets(e).length, 0);
-  const plannedSets = session.exercises.reduce((sum, e) => sum + e.sets.length, 0);
+  // Le posizioni di allungamento non sono serie: fuori dal conteggio.
+  const plannedSets = session.exercises
+    .filter((e) => e.phase !== 'stretching')
+    .reduce((sum, e) => sum + e.sets.length, 0);
 
   const finish = async () => {
     if (doneSets === 0) {
@@ -171,8 +174,64 @@ export default function SessionScreen() {
             />
           ) : null}
 
-          {session.exercises.map((item) => {
+          {session.exercises.map((item, exerciseIndex) => {
             const exercise = getExercise(item.exerciseId);
+
+            // Il defaticamento ha una riga sua: niente carichi, solo il tempo
+            // di tenuta e la spunta.
+            if (item.phase === 'stretching') {
+              const apreSezione = session.exercises[exerciseIndex - 1]?.phase !== 'stretching';
+              const set = item.sets[0];
+
+              return (
+                <View key={item.id} style={styles.stretchBlock}>
+                  {apreSezione ? (
+                    <View style={styles.stretchIntro}>
+                      <ThemedText type="captionBold" themeColor="accent">
+                        DEFATICAMENTO
+                      </ThemedText>
+                      <ThemedText type="caption" themeColor="textSecondary">
+                        I muscoli di oggi più collo e spalle, contro la testa che va avanti.
+                        Trenta secondi a posizione, senza rimbalzi, respirando.
+                      </ThemedText>
+                    </View>
+                  ) : null}
+
+                  <Card compact>
+                    <View style={styles.stretchRow}>
+                      <Pressable
+                        accessibilityLabel={set?.done ? 'Fatto' : 'Segna come fatto'}
+                        onPress={() => set && actions.patchSet(item.id, set.id, { done: !set.done })}
+                        style={[
+                          styles.checkBox,
+                          { backgroundColor: set?.done ? theme.success : theme.backgroundSelected },
+                        ]}>
+                        <Ionicons
+                          name="checkmark"
+                          size={18}
+                          color={set?.done ? '#FFFFFF' : theme.textMuted}
+                        />
+                      </Pressable>
+
+                      <View style={styles.flexShrink}>
+                        <ThemedText type="bodyBold">
+                          {exercise?.name ?? 'Esercizio rimosso'}
+                        </ThemedText>
+                        {exercise?.notes ? (
+                          <ThemedText type="caption" themeColor="textSecondary">
+                            {exercise.notes}
+                          </ThemedText>
+                        ) : null}
+                      </View>
+
+                      <ThemedText type="mono" themeColor="textSecondary">
+                        {item.targetReps}
+                      </ThemedText>
+                    </View>
+                  </Card>
+                </View>
+              );
+            }
             const previous = lastPerformance(state.sessions, item.exerciseId);
             const best = previous?.sets.reduce(
               (top, set) => (set.weight > top.weight ? set : top),
@@ -412,6 +471,9 @@ const styles = StyleSheet.create({
   },
   colIndex: { width: 24, alignItems: 'center' },
   advice: { marginTop: 2 },
+  stretchBlock: { gap: Spacing.two },
+  stretchIntro: { gap: 2, marginTop: Spacing.two },
+  stretchRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three },
   colTarget: { width: 46, alignItems: 'center', justifyContent: 'center' },
   colField: { flex: 1 },
   colCheck: { width: 44, height: 36 },

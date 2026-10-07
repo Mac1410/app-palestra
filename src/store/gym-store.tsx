@@ -14,6 +14,7 @@ import { type BackupData } from '@/lib/backup';
 import { createId } from '@/lib/id';
 import { buildProgram } from '@/lib/plan';
 import { planExercise } from '@/lib/progression';
+import { buildStretching, sessionMuscles } from '@/lib/stretching';
 import { clearState, loadState, saveState } from '@/store/storage';
 import {
   EMPTY_STATE,
@@ -396,6 +397,7 @@ export function GymProvider({ children }: { children: ReactNode }) {
         const routine = routineId
           ? stateRef.current.routines.find((r) => r.id === routineId)
           : undefined;
+        const catalog = [...BUILTIN_EXERCISES, ...stateRef.current.customExercises];
         const session: Session = {
           id: createId('session'),
           routineId: routine?.id,
@@ -410,6 +412,14 @@ export function GymProvider({ children }: { children: ReactNode }) {
             }),
           ),
         };
+        // Coda di allungamento, se l'utente l'ha chiesta nelle impostazioni.
+        if (stateRef.current.settings.stretching) {
+          session.exercises = [
+            ...session.exercises,
+            ...buildStretching(sessionMuscles(session.exercises, catalog), catalog),
+          ];
+        }
+
         dispatch({ type: 'session/start', session });
         return session;
       },

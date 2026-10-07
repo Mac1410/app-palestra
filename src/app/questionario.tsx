@@ -330,7 +330,9 @@ export default function QuestionnaireScreen() {
         done: true,
         content: (
           <View style={styles.chips}>
-            {MUSCLE_GROUPS.filter((muscle) => muscle !== 'Cardio').map((muscle) => (
+            {MUSCLE_GROUPS.filter(
+              (muscle) => muscle !== 'Cardio' && muscle !== 'Collo',
+            ).map((muscle) => (
               <Chip
                 key={muscle}
                 label={muscle}
