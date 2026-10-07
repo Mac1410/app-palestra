@@ -242,9 +242,23 @@ export default function SessionScreen() {
               <Card key={item.id}>
                 <View style={styles.exerciseHeader}>
                   <View style={styles.flexShrink}>
-                    <ThemedText type="subtitle" numberOfLines={2}>
-                      {exercise?.name ?? 'Esercizio rimosso'}
-                    </ThemedText>
+                    {/* Il nome apre la scheda dell'esercizio: muscoli coinvolti,
+                        esecuzione e storico, senza uscire dall'allenamento. */}
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={`Scheda di ${exercise?.name ?? 'esercizio'}`}
+                      onPress={() =>
+                        router.push({
+                          pathname: '/esercizio/[id]',
+                          params: { id: item.exerciseId },
+                        })
+                      }
+                      style={styles.nameRow}>
+                      <ThemedText type="subtitle" numberOfLines={2} style={styles.flexShrink}>
+                        {exercise?.name ?? 'Esercizio rimosso'}
+                      </ThemedText>
+                      <Ionicons name="information-circle-outline" size={17} color={theme.textMuted} />
+                    </Pressable>
                     <ThemedText type="caption" themeColor="textSecondary">
                       {item.targetReps ? `Obiettivo ${item.targetReps} rip · ` : ''}
                       recupero {item.restSec}s
@@ -470,6 +484,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.half,
   },
   colIndex: { width: 24, alignItems: 'center' },
+  nameRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
   advice: { marginTop: 2 },
   stretchBlock: { gap: Spacing.two },
   stretchIntro: { gap: 2, marginTop: Spacing.two },

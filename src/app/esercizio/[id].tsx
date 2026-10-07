@@ -1,6 +1,7 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
+import { MuscleMap } from '@/components/body/muscle-map';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -9,8 +10,9 @@ import { useDialog } from '@/components/ui/dialog';
 import { EmptyState, SectionHeader } from '@/components/ui/feedback';
 import { Screen } from '@/components/ui/screen';
 import { BarChart, StatTile } from '@/components/ui/stats';
-import { Spacing } from '@/constants/theme';
+import { Colors, Spacing } from '@/constants/theme';
 import { formatRelativeDay, formatShortDate, formatVolume } from '@/lib/format';
+import { secondaryMuscles } from '@/lib/muscles';
 import { exerciseHistory, personalRecord } from '@/lib/stats';
 import { useGym } from '@/store/gym-store';
 
@@ -30,6 +32,7 @@ export default function ExerciseDetailScreen() {
     );
   }
 
+  const secondary = secondaryMuscles(exercise);
   const history = exerciseHistory(state.sessions, exercise.id);
   const record = personalRecord(state.sessions, exercise.id);
   const chartData = history
@@ -73,6 +76,27 @@ export default function ExerciseDetailScreen() {
           </ThemedText>
         </Card>
       ) : null}
+
+      <SectionHeader title="Muscoli coinvolti" />
+      <Card>
+        <MuscleMap primary={exercise.muscle} secondary={secondary} />
+        <View style={styles.legend}>
+          <View style={styles.legendItem}>
+            <View style={[styles.dot, { backgroundColor: Colors.accent }]} />
+            <ThemedText type="caption" themeColor="textSecondary">
+              {exercise.muscle}
+            </ThemedText>
+          </View>
+          {secondary.length > 0 ? (
+            <View style={styles.legendItem}>
+              <View style={[styles.dot, { backgroundColor: '#4E8F6B' }]} />
+              <ThemedText type="caption" themeColor="textSecondary">
+                {secondary.join(', ')}
+              </ThemedText>
+            </View>
+          ) : null}
+        </View>
+      </Card>
 
       <View style={styles.tiles}>
         <StatTile
@@ -142,6 +166,9 @@ export default function ExerciseDetailScreen() {
 }
 
 const styles = StyleSheet.create({
+  legend: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.three, marginTop: Spacing.two },
+  legendItem: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
+  dot: { width: 10, height: 10, borderRadius: 5 },
   header: { gap: Spacing.two, marginTop: Spacing.two },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.one + 2 },
   tiles: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two },
