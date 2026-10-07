@@ -1,7 +1,11 @@
 /**
- * Direzione visiva "Linfa": verde chiaro su fondo scuro.
- * L'app è deliberatamente a tema unico scuro — la palette è l'identità,
- * non una preferenza di sistema, quindi non esiste una variante chiara.
+ * Direzione visiva "Linfa": verde chiaro su grigio-verde.
+ *
+ * Il tema è unico per scelta di identità (niente variante chiara di sistema),
+ * ma non è nero: il fondo è un grigio-verde profondo e le superfici salgono di
+ * tono una sopra l'altra. Il verde resta la cosa più luminosa dello schermo, e
+ * per questo attira l'occhio dove serve — il numero della settimana, il
+ * pulsante che fa partire l'allenamento, la serie completata.
  */
 
 import '@/global.css';
@@ -9,21 +13,21 @@ import '@/global.css';
 import { Platform } from 'react-native';
 
 export const Colors = {
-  text: '#FFFFFF',
-  textSecondary: '#8E9A90',
-  textMuted: '#6D7971',
-  background: '#080B09',
-  backgroundElement: '#141A16',
-  backgroundSelected: '#1E2721',
-  border: '#1F2821',
-  accent: '#7BE495',
-  accentSoft: '#10251A',
-  onAccent: '#06160D',
-  success: '#34C79A',
-  successSoft: '#0F2A24',
-  danger: '#FF6369',
-  dangerSoft: '#3A1B1D',
-  track: '#1E2721',
+  text: '#F3F8F4',
+  textSecondary: '#AEBDB3',
+  textMuted: '#879688',
+  background: '#18231D',
+  backgroundElement: '#223029',
+  backgroundSelected: '#2C3D34',
+  border: '#36483D',
+  accent: '#86EFAC',
+  accentSoft: '#27402F',
+  onAccent: '#0C2116',
+  success: '#3FD1A4',
+  successSoft: '#1B3A33',
+  danger: '#FF7A80',
+  dangerSoft: '#452429',
+  track: '#2C3D34',
 } as const;
 
 export type ThemeColor = keyof typeof Colors;
@@ -31,12 +35,12 @@ export type Theme = typeof Colors;
 
 /** Sfumature del verde, usate da tessere, anello e bagliore. */
 export const Linfa = {
-  tileA: ['#5FD68A', '#2C7A4F'] as const,
-  tileB: ['#49C27A', '#1F5F3D'] as const,
-  ring: ['#D4F8D0', '#7BE495', '#2E9E5B'] as const,
-  glowHot: '#49D983',
-  glowWarm: '#B6F3C0',
-  glowDeep: '#1C7A48',
+  tileA: ['#7BE09B', '#3E9A6A'] as const,
+  tileB: ['#66D18B', '#2F8457'] as const,
+  ring: ['#DCFBE4', '#86EFAC', '#3FA06B'] as const,
+  glowHot: '#5BD98C',
+  glowWarm: '#C6F7D2',
+  glowDeep: '#2A8255',
 } as const;
 
 export const Fonts = Platform.select({

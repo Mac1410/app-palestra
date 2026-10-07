@@ -20,12 +20,12 @@ const ROOT = path.resolve(import.meta.dirname, '..');
 
 // --- palette (la stessa di src/constants/theme.ts) -------------------------
 
-const SFONDO = [8, 11, 9];
-const BAGLIORE = [73, 217, 131];
+const SFONDO = [24, 35, 29];
+const BAGLIORE = [91, 217, 140];
 const ANELLO = [
-  [212, 248, 208],
-  [123, 228, 149],
-  [46, 158, 91],
+  [220, 251, 228],
+  [134, 239, 172],
+  [63, 160, 107],
 ];
 const METALLO = [255, 255, 255];
 

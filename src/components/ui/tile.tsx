@@ -86,7 +86,9 @@ const styles = StyleSheet.create({
     padding: Spacing.three + 2,
     justifyContent: 'space-between',
   },
-  tileTitle: { color: '#FFFFFF' },
+  // Il titolo è scuro perché la tessera è chiara: il bianco su verde chiaro
+  // non si legge.
+  tileTitle: { color: '#0C2015' },
   chip: {
     alignSelf: 'flex-start',
     flexDirection: 'row',
@@ -98,12 +100,12 @@ const styles = StyleSheet.create({
     paddingRight: Spacing.one,
     paddingVertical: Spacing.one + 1,
   },
-  chipText: { color: '#0A1A10' },
+  chipText: { color: '#0C2015' },
   chipIcon: {
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#0A1A10',
+    backgroundColor: '#0C2015',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -120,6 +122,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.textMuted,
     borderRadius: 1,
   },
-  tickMajor: { backgroundColor: '#4F7A63' },
-  tickCenter: { width: 1.5, backgroundColor: '#C7FFD9' },
+  tickMajor: { backgroundColor: '#6A9B7C' },
+  tickCenter: { width: 1.5, backgroundColor: '#DCFBE4' },
 });

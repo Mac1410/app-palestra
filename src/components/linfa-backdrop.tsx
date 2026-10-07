@@ -68,7 +68,7 @@ export function LinfaBackdrop({ width, height = 470 }: Props) {
       <Ellipse cx={width * 0.74} cy={44} rx={width * 0.36} ry={68} fill="url(#deep)" />
 
       {/* anello: cerchio spento più arco acceso in basso */}
-      <Circle cx={cx} cy={cy} r={r} stroke="#1E3A28" strokeWidth={2} fill="none" />
+      <Circle cx={cx} cy={cy} r={r} stroke="#33543F" strokeWidth={2} fill="none" />
       <Path d={arcPath(cx, cy, r, 118, 298)} stroke="url(#arc)" strokeWidth={34} strokeOpacity={0.2} fill="none" strokeLinecap="round" />
       <Path d={arcPath(cx, cy, r, 122, 294)} stroke="url(#arc)" strokeWidth={18} strokeOpacity={0.38} fill="none" strokeLinecap="round" />
       <Path d={arcPath(cx, cy, r, 128, 288)} stroke="url(#arc)" strokeWidth={8} strokeOpacity={0.85} fill="none" strokeLinecap="round" />
