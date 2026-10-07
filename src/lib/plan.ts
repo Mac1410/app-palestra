@@ -971,7 +971,8 @@ export function buildProgram(profile: Profile, catalog: Exercise[]): GeneratedPr
 // ---------------------------------------------------------------------------
 
 const GOAL_EXPLANATION: Record<Goal, string> = {
-  massa: 'serie da 6 a 12 ripetizioni e recuperi medi, il terreno dove il muscolo cresce',
+  massa:
+    'poche ripetizioni con carichi alti, recuperi pieni fra le serie e più di un esercizio per gruppo',
   forza: 'poche ripetizioni e recuperi lunghi, perché la forza chiede carichi alti e lucidità',
   dimagrimento: 'più ripetizioni e recuperi brevi, per tenere alto il dispendio',
   ricomposizione: 'ripetizioni medie e recuperi contenuti, una via di mezzo fra muscolo e dispendio',
@@ -992,7 +993,7 @@ function explain(profile: Profile, split: SplitKind, routines: Routine[]): strin
     'push-pull-legs-upper-lower':
       'cinque sedute permettono il giro completo più due richiami sulle zone che ne hanno bisogno.',
     'per-gruppo':
-      'sedute corte e frequenti rendono di più dedicate a un gruppo per volta: tre o quattro esercizi mirati stanno in mezz’ora, un full body no.',
+      'sedute corte e frequenti rendono di più dedicate a un gruppo per volta: tre o quattro esercizi mirati su una sola zona stanno anche in mezz’ora.',
   };
 
   reasons.push(
