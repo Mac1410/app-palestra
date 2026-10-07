@@ -44,6 +44,16 @@ if (!fs.existsSync(path.join(DIST, 'index.html'))) {
 fs.rmSync(path.join(DIST, '.git'), { recursive: true, force: true });
 
 run('git', ['init', '-b', BRANCH], { cwd: DIST, quiet: true });
+
+// Il repository temporaneo non eredita la configurazione: senza nome e email
+// git si rifiuta di creare il commit.
+const author = {
+  name: run('git', ['log', '-1', '--format=%an'], { quiet: true }).trim() || 'Palestra',
+  email: run('git', ['log', '-1', '--format=%ae'], { quiet: true }).trim() || 'palestra@local',
+};
+run('git', ['config', 'user.name', author.name], { cwd: DIST, quiet: true });
+run('git', ['config', 'user.email', author.email], { cwd: DIST, quiet: true });
+
 run('git', ['add', '-A'], { cwd: DIST, quiet: true });
 run('git', ['commit', '-m', `Pubblicazione del ${new Date().toLocaleString('it-IT')}`], {
   cwd: DIST,

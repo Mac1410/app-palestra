@@ -32,6 +32,50 @@ npm run typecheck
 - `npm run ios` — apre direttamente il simulatore iOS (solo su macOS)
 - `npm run web` — anteprima nel browser, comoda per uno sguardo veloce
 
+## Web app sull'iPhone (icona sulla schermata Home)
+
+L'app è pubblicata come web app installabile:
+
+**https://mac1410.github.io/app-palestra/**
+
+Per metterla sulla schermata Home: aprire l'indirizzo **in Safari** (non in
+Chrome né dentro un'altra app), toccare **Condividi** e poi **Aggiungi alla
+schermata Home**. Da quel momento si apre a schermo intero con la sua icona, e
+funziona anche senza rete: il service worker tiene in cache tutti i file.
+
+I dati restano nella memoria del telefono e l'app installata ha un archivio
+tutto suo, separato da quello di Safari: gli allenamenti registrati nella
+scheda di Safari non si vedono nell'app installata. Conviene quindi aggiungerla
+alla Home **prima** di cominciare a usarla sul serio, e di tanto in tanto
+esportare un backup da Impostazioni.
+
+### Pubblicare una nuova versione
+
+```bash
+npm run deploy:web
+```
+
+Costruisce la web app e aggiorna il ramo `gh-pages`, da cui GitHub Pages serve
+il sito (un paio di minuti perché l'aggiornamento compaia). Sui telefoni che
+l'hanno già installata la versione nuova arriva alla riapertura successiva.
+
+Comandi collegati:
+
+- `npm run build:web` — costruisce in `dist/` senza pubblicare
+- `npm run serve:web` — serve `dist/` su `http://localhost:8088/app-palestra/`
+  per provarla com'è online, service worker compreso
+
+Dettagli tecnici della web app:
+
+- `scripts/build-web.mjs` — esegue `expo export`, poi aggiunge manifest, icona,
+  service worker (con l'elenco esatto dei file da tenere offline) e i file che
+  servono a GitHub Pages (`.nojekyll`, `404.html`)
+- `app.config.js` — imposta il percorso di base `/app-palestra` solo durante la
+  build web, così lo sviluppo con Expo Go resta identico
+- `src/components/ui/dialog.tsx` — le conferme dell'app; `Alert` di React Native
+  sul web non esiste, quindi i dialoghi sono viste normali
+- `src/lib/backup.ts` — esportazione e importazione del file di backup
+
 ## Cosa fa l'app
 
 **Oggi** — il volume della settimana come numero protagonista dentro l'anello di
@@ -52,6 +96,9 @@ record di carico, 1RM stimato, andamento e storico completo.
 **Progressi** — volume totale, giorni attivi, serie, istogramma del volume delle
 ultime 8 settimane, ripartizione per gruppo muscolare degli ultimi 30 giorni e
 storico di tutti gli allenamenti.
+
+**Impostazioni** — obiettivo settimanale, recupero predefinito, backup dei dati
+(esportazione e reimportazione del file JSON) e cancellazione completa.
 
 **Allenamento in corso** — cronometro, volume e serie in tempo reale; per ogni
 esercizio una griglia kg × ripetizioni con spunta di completamento (tocca il
@@ -94,9 +141,13 @@ src/
   constants/theme.ts      palette Ember, spaziature, raggi
   data/exercises.ts       catalogo di base e schede di esempio
   hooks/                  tema e feedback aptico
-  lib/                    formattazione italiana e calcoli (volume, 1RM, streak)
+  lib/                    formattazione italiana, calcoli (volume, 1RM, streak), backup
   store/                  stato globale (reducer) e persistenza AsyncStorage
   types/                  modello dati
+scripts/
+  build-web.mjs           costruisce la web app installabile
+  serve-dist.mjs          la prova in locale come se fosse online
+  deploy-pages.mjs        la pubblica su GitHub Pages
 ```
 
 ## Note tecniche
