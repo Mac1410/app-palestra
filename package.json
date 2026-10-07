@@ -44,7 +44,8 @@
     "serve:web": "node scripts/serve-dist.mjs",
     "deploy:web": "node scripts/deploy-pages.mjs",
     "check:plan": "node scripts/prova-programmi.mjs",
-    "check:progressione": "node scripts/prova-progressione.mjs"
+    "check:progressione": "node scripts/prova-progressione.mjs",
+    "icona": "node scripts/genera-icona.mjs"
   },
   "private": true
 }

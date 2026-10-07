@@ -167,6 +167,7 @@ scripts/
   build-web.mjs           costruisce la web app installabile
   serve-dist.mjs          la prova in locale come se fosse online
   deploy-pages.mjs        la pubblica su GitHub Pages
+  genera-icona.mjs        disegna l'icona dell'app (brace, anello, bilanciere)
   prova-programmi.mjs     genera i programmi di diciannove profili e li controlla
   prova-progressione.mjs  verifica le decisioni su carichi e varianti
 ```
