@@ -178,9 +178,15 @@ Le decisioni, in ordine:
 1. **Cosa è possibile** — a casa restano solo gli esercizi fattibili con
    l'attrezzatura dichiarata; le zone delicate escludono gli esercizi che le
    caricano, e il generatore ripiega su alternative dello stesso schema.
-2. **La suddivisione** — più sedute brevi significano meno tempo per volta,
-   quindi conviene dividere il corpo; poche sedute lunghe chiedono il
-   contrario. Da qui full body, upper/lower, push-pull-legs o circuito.
+2. **La suddivisione** — decisa dall'incrocio fra disponibilità e obiettivo.
+   L'aritmetica dice che tante sedute brevi vanno divise e poche sedute lunghe
+   no; l'obiettivo però pesa quanto quella. Per la **massa** servono carichi
+   alti, recuperi pieni e più esercizi sullo stesso gruppo, che in un full body
+   di quarantacinque minuti non ci stanno: il programma divide sempre, fino
+   alla divisione per gruppo muscolare (petto, dorso, gambe, spalle, braccia)
+   quando le sedute sono corte e frequenti. La **forza** fa il contrario, pochi
+   movimenti ripetuti spesso, quindi full body finché i giorni lo consentono.
+   Restano upper/lower, push-pull-legs e il circuito a corpo libero.
 3. **Il tempo** — ogni seduta viene stimata in minuti e fatta rientrare nella
    durata dichiarata. Le rinunce seguono un ordine: prima i complementi, poi le
    serie, poi i recuperi (mai sotto una soglia, o l'allenamento cambia natura),

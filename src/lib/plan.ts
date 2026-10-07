@@ -95,9 +95,11 @@ const SCHEMES: Record<Goal, Record<ExerciseRole, Scheme>> = {
     isolamento: { sets: 3, reps: '8-12', restSec: 75 },
   },
   massa: {
-    fondamentale: { sets: 4, reps: '6-10', restSec: 120 },
-    complementare: { sets: 3, reps: '8-12', restSec: 90 },
-    isolamento: { sets: 3, reps: '12-15', restSec: 60 },
+    // Carichi alti e poche ripetizioni sui fondamentali, con recuperi pieni:
+    // senza recupero il carico cala e la serie successiva non allena più.
+    fondamentale: { sets: 4, reps: '6-8', restSec: 150 },
+    complementare: { sets: 4, reps: '8-10', restSec: 120 },
+    isolamento: { sets: 3, reps: '10-12', restSec: 75 },
   },
   ricomposizione: {
     fondamentale: { sets: 4, reps: '8-10', restSec: 90 },
@@ -343,6 +345,84 @@ const LOWER_B_SLOTS: Slot[] = [
   { patterns: ['isolamento'], role: 'isolamento', muscles: ['Polpacci'], optional: true },
 ];
 
+/**
+ * Sedute per gruppo muscolare: poche zone per volta, ma lavorate davvero.
+ * È la risposta giusta quando l'obiettivo è la massa e il tempo per seduta è
+ * poco: concentrare tutto su un gruppo permette comunque tre o quattro
+ * esercizi mirati, cosa impossibile in un full body di quarantacinque minuti.
+ */
+const CHEST_DAY: Slot[] = [
+  { patterns: ['spinta-orizzontale'], role: 'fondamentale' },
+  { patterns: ['spinta-orizzontale'], role: 'complementare' },
+  { patterns: ['isolamento'], role: 'isolamento', muscles: ['Petto'] },
+  { patterns: ['isolamento'], role: 'isolamento', muscles: ['Petto'], optional: true },
+  { patterns: ['isolamento', 'spinta-orizzontale'], role: 'isolamento', muscles: ['Tricipiti'] },
+  { patterns: ['isolamento'], role: 'isolamento', muscles: ['Tricipiti'], optional: true },
+];
+
+const BACK_DAY: Slot[] = [
+  { patterns: ['trazione-verticale'], role: 'fondamentale' },
+  { patterns: ['trazione-orizzontale'], role: 'fondamentale' },
+  { patterns: ['trazione-orizzontale', 'trazione-verticale'], role: 'complementare' },
+  { patterns: ['isolamento'], role: 'isolamento', muscles: ['Dorso'], optional: true },
+  { patterns: ['isolamento'], role: 'isolamento', muscles: ['Bicipiti'] },
+  { patterns: ['isolamento'], role: 'isolamento', muscles: ['Bicipiti'], optional: true },
+];
+
+const LEG_DAY: Slot[] = [
+  { patterns: ['squat'], role: 'fondamentale' },
+  { patterns: ['cerniera'], role: 'fondamentale' },
+  { patterns: ['affondo'], role: 'complementare' },
+  { patterns: ['isolamento'], role: 'isolamento', muscles: ['Gambe'] },
+  { patterns: ['isolamento'], role: 'isolamento', muscles: ['Gambe', 'Glutei'], optional: true },
+  { patterns: ['isolamento'], role: 'isolamento', muscles: ['Polpacci'], optional: true },
+];
+
+const SHOULDER_DAY: Slot[] = [
+  { patterns: ['spinta-verticale'], role: 'fondamentale' },
+  { patterns: ['spinta-verticale'], role: 'complementare' },
+  { patterns: ['isolamento'], role: 'isolamento', muscles: ['Spalle'] },
+  { patterns: ['isolamento'], role: 'isolamento', muscles: ['Spalle'], optional: true },
+  { patterns: ['isolamento', 'mobilita'], role: 'complementare', muscles: ['Spalle'] },
+  { patterns: ['core'], role: 'complementare', optional: true },
+];
+
+const ARM_DAY: Slot[] = [
+  { patterns: ['isolamento'], role: 'isolamento', muscles: ['Bicipiti'] },
+  { patterns: ['isolamento', 'spinta-orizzontale'], role: 'complementare', muscles: ['Tricipiti'] },
+  { patterns: ['isolamento'], role: 'isolamento', muscles: ['Bicipiti'] },
+  { patterns: ['isolamento'], role: 'isolamento', muscles: ['Tricipiti'] },
+  { patterns: ['isolamento'], role: 'isolamento', muscles: ['Spalle'], optional: true },
+  { patterns: ['core'], role: 'complementare', optional: true },
+];
+
+const CHEST_EXTRAS: Slot[] = [
+  { patterns: ['isolamento'], role: 'isolamento', muscles: ['Petto'] },
+  { patterns: ['isolamento'], role: 'isolamento', muscles: ['Tricipiti'] },
+  { patterns: ['spinta-orizzontale'], role: 'complementare' },
+  CORE_EXTRA,
+];
+
+const BACK_EXTRAS: Slot[] = [
+  { patterns: ['isolamento'], role: 'isolamento', muscles: ['Dorso'] },
+  { patterns: ['isolamento'], role: 'isolamento', muscles: ['Bicipiti'] },
+  { patterns: ['trazione-orizzontale', 'trazione-verticale'], role: 'complementare' },
+  CORE_EXTRA,
+];
+
+const SHOULDER_EXTRAS: Slot[] = [
+  { patterns: ['isolamento'], role: 'isolamento', muscles: ['Spalle'] },
+  { patterns: ['isolamento', 'mobilita'], role: 'complementare', muscles: ['Spalle'] },
+  CORE_EXTRA,
+];
+
+const ARM_EXTRAS: Slot[] = [
+  { patterns: ['isolamento'], role: 'isolamento', muscles: ['Bicipiti'] },
+  { patterns: ['isolamento'], role: 'isolamento', muscles: ['Tricipiti'] },
+  { patterns: ['isolamento'], role: 'isolamento', muscles: ['Spalle'] },
+  CORE_EXTRA,
+];
+
 function fullBodySlots(variant: 'A' | 'B' | 'C'): Slot[] {
   const common: Slot[] = [{ patterns: ['core'], role: 'complementare', optional: true }];
 
@@ -422,34 +502,53 @@ function postureSlots(variant: 'A' | 'B'): Slot[] {
 /**
  * Sceglie la suddivisione.
  *
- * Il ragionamento: più sedute brevi significa meno tempo per seduta, quindi
- * conviene dividere il corpo in parti più piccole e allenarle meglio; poche
- * sedute lunghe chiedono invece il contrario, cioè toccare tutto ogni volta.
+ * Contano due cose insieme. La prima è aritmetica: tante sedute brevi
+ * significano poco tempo per volta, quindi conviene dividere il corpo in parti
+ * più piccole; poche sedute lunghe chiedono il contrario.
+ *
+ * La seconda è l'obiettivo, e pesa quanto la prima. Per la massa servono
+ * carichi alti, recuperi pieni e più esercizi sullo stesso gruppo: roba che in
+ * un full body di quarantacinque minuti non ci sta: o si tagliano i recuperi,
+ * e allora il carico crolla, o si tocca ogni gruppo con un esercizio solo. Per
+ * questo chi punta alla massa viene sempre diviso, fino alla divisione per
+ * gruppo muscolare quando le sedute sono corte e frequenti. La forza fa il
+ * percorso opposto: pochi movimenti, ripetuti spesso, quindi full body finché
+ * i giorni lo consentono.
  */
 export function chooseSplit(profile: Profile): SplitKind {
-  const { daysPerWeek, sessionMinutes, experience, place, goal } = profile;
+  const { daysPerWeek, sessionMinutes, place, goal } = profile;
 
   // A casa senza attrezzi il lavoro a carico naturale si organizza a circuito.
   const equipment = availableEquipment(profile);
   const onlyBodyweight = equipment.size === 1 && equipment.has('Corpo libero');
   if (onlyBodyweight && place === 'casa') return 'circuito';
 
+  // Sotto l'ora, una seduta non regge più di due gruppi muscolari fatti bene.
+  const shortSession = sessionMinutes < 60;
+
+  if (goal === 'massa') {
+    if (daysPerWeek <= 2) {
+      // Con due sole sedute il full body ha senso solo se sono lunghe.
+      return sessionMinutes >= 75 ? 'full-body' : 'upper-lower';
+    }
+    if (daysPerWeek === 3) return 'push-pull-legs';
+    if (daysPerWeek === 4) return shortSession ? 'per-gruppo' : 'upper-lower';
+    if (daysPerWeek === 5) return 'per-gruppo';
+    // Sei o sette giorni: ogni gruppo due volte a settimana.
+    return 'push-pull-legs';
+  }
+
+  if (goal === 'forza') {
+    // I fondamentali rendono con la frequenza, non con la frammentazione.
+    if (daysPerWeek <= 3) return sessionMinutes <= 40 ? 'push-pull-legs' : 'full-body';
+    if (daysPerWeek === 4) return 'upper-lower';
+    return 'push-pull-legs';
+  }
+
   if (daysPerWeek <= 2) return 'full-body';
-
-  if (daysPerWeek === 3) {
-    // Sedute corte e obiettivo di volume: meglio dividere.
-    if (sessionMinutes <= 40 && (goal === 'massa' || goal === 'forza')) return 'push-pull-legs';
-    if (experience === 'principiante') return 'full-body';
-    return goal === 'massa' ? 'push-pull-legs' : 'full-body';
-  }
-
-  if (daysPerWeek === 4) {
-    if (sessionMinutes <= 35) return 'push-pull-legs';
-    return 'upper-lower';
-  }
-
+  if (daysPerWeek === 3) return shortSession && goal === 'ricomposizione' ? 'push-pull-legs' : 'full-body';
+  if (daysPerWeek === 4) return 'upper-lower';
   if (daysPerWeek === 5) return 'push-pull-legs-upper-lower';
-
   return 'push-pull-legs';
 }
 
@@ -501,8 +600,8 @@ function blueprints(split: SplitKind, profile: Profile): Blueprint[] {
       }));
     }
 
-    case 'upper-lower':
-      return [
+    case 'upper-lower': {
+      const upperLower: Blueprint[] = [
         {
           name: 'Upper A',
           focus: 'Parte alta: spinte e trazioni',
@@ -528,6 +627,10 @@ function blueprints(split: SplitKind, profile: Profile): Blueprint[] {
           extras: LOWER_EXTRAS,
         },
       ];
+      // Con due o tre sedute a settimana le varianti B tornerebbero una volta
+      // ogni quindici giorni: meglio due schede sole, ripetute più spesso.
+      return days <= 3 ? upperLower.slice(0, 2) : upperLower;
+    }
 
     case 'push-pull-legs':
       return [
@@ -535,6 +638,39 @@ function blueprints(split: SplitKind, profile: Profile): Blueprint[] {
         { name: 'Pull', focus: 'Dorso e bicipiti', slots: PULL_SLOTS, extras: PULL_EXTRAS },
         { name: 'Legs', focus: 'Gambe, glutei e core', slots: LEGS_SLOTS, extras: LEGS_EXTRAS },
       ];
+
+    case 'per-gruppo':
+      // Quattro giorni: le braccia restano attaccate al loro gruppo di spinta
+      // o di tirata; dal quinto in poi hanno una seduta tutta loro.
+      return days >= 5
+        ? [
+            { name: 'Petto', focus: 'Tutto sul petto', slots: CHEST_DAY, extras: CHEST_EXTRAS },
+            { name: 'Dorso', focus: 'Tutto sulla schiena', slots: BACK_DAY, extras: BACK_EXTRAS },
+            { name: 'Gambe', focus: 'Cosce, glutei e polpacci', slots: LEG_DAY, extras: LEGS_EXTRAS },
+            { name: 'Spalle', focus: 'Spalle e stabilità', slots: SHOULDER_DAY, extras: SHOULDER_EXTRAS },
+            { name: 'Braccia', focus: 'Bicipiti e tricipiti', slots: ARM_DAY, extras: ARM_EXTRAS },
+          ]
+        : [
+            {
+              name: 'Petto e tricipiti',
+              focus: 'Spinte e braccia distese',
+              slots: CHEST_DAY,
+              extras: CHEST_EXTRAS,
+            },
+            {
+              name: 'Dorso e bicipiti',
+              focus: 'Tirate e braccia flesse',
+              slots: BACK_DAY,
+              extras: BACK_EXTRAS,
+            },
+            { name: 'Gambe', focus: 'Cosce, glutei e polpacci', slots: LEG_DAY, extras: LEGS_EXTRAS },
+            {
+              name: 'Spalle e core',
+              focus: 'Spalle, deltoidi e tronco',
+              slots: SHOULDER_DAY,
+              extras: SHOULDER_EXTRAS,
+            },
+          ];
 
     case 'push-pull-legs-upper-lower':
       return [
@@ -704,6 +840,7 @@ function topUp(
   picker: Picker,
   profile: Profile,
   extras: Slot[],
+  maxPerMuscle: number,
 ): void {
   const total = () => items.reduce((sum, item) => sum + estimateMinutes(item.scheme), 0);
   const countFor = (muscle: string) =>
@@ -718,8 +855,10 @@ function topUp(
     const exercise = pick(slot, picker);
     if (!exercise) continue;
 
-    // Niente accanimento sullo stesso muscolo solo per riempire il tempo.
-    if (countFor(exercise.muscle) >= 2) continue;
+    // Quanto si può insistere su un gruppo dipende da come è fatta la seduta:
+    // in una giornata dedicata al petto quattro esercizi sono il punto, in un
+    // full body sarebbero accanimento.
+    if (countFor(exercise.muscle) >= maxPerMuscle) continue;
 
     const scheme = schemeFor(exercise, profile);
     if (total() + estimateMinutes(scheme) > budget) continue;
@@ -782,7 +921,9 @@ export function buildProgram(profile: Profile, catalog: Exercise[]): GeneratedPr
     const liftingBudget = budget - cardioMinutes;
 
     const items = fitToTime(planned, liftingBudget, profile);
-    topUp(items, liftingBudget, picker, profile, blueprint.extras);
+    // Più il programma è diviso, più si insiste sullo stesso gruppo.
+    const maxPerMuscle = split === 'per-gruppo' ? 4 : profile.goal === 'massa' ? 3 : 2;
+    topUp(items, liftingBudget, picker, profile, blueprint.extras, maxPerMuscle);
 
     if (wantsCardio) {
       const cardio = pick({ patterns: ['cardio'], role: 'complementare' }, picker);
@@ -842,16 +983,28 @@ function explain(profile: Profile, split: SplitKind, routines: Routine[]): strin
   const reasons: string[] = [];
 
   const sessionWord = profile.daysPerWeek === 1 ? 'volta' : 'volte';
+
+  const splitReason: Record<SplitKind, string> = {
+    'full-body': 'con poche sedute conviene toccare tutto il corpo ogni volta.',
+    circuito: 'senza attrezzi il lavoro rende di più organizzato a circuito.',
+    'upper-lower': 'separare la parte alta dalla parte bassa lascia a ogni zona il tempo che merita.',
+    'push-pull-legs': 'dividere per spinte, tirate e gambe permette più lavoro su ogni zona senza allungare la seduta.',
+    'push-pull-legs-upper-lower':
+      'cinque sedute permettono il giro completo più due richiami sulle zone che ne hanno bisogno.',
+    'per-gruppo':
+      'sedute corte e frequenti rendono di più dedicate a un gruppo per volta: tre o quattro esercizi mirati stanno in mezz’ora, un full body no.',
+  };
+
   reasons.push(
     `Ti alleni ${profile.daysPerWeek} ${sessionWord} a settimana per circa ${profile.sessionMinutes} minuti: ` +
-      (split === 'full-body'
-        ? 'con poche sedute conviene toccare tutto il corpo ogni volta.'
-        : split === 'circuito'
-          ? 'senza attrezzi il lavoro rende di più organizzato a circuito.'
-          : split === 'upper-lower'
-            ? 'quattro sedute permettono di separare la parte alta dalla parte bassa.'
-            : 'con sedute frequenti e corte conviene dividere il corpo e curare meglio ogni parte.'),
+      splitReason[split],
   );
+
+  if (profile.goal === 'massa') {
+    reasons.push(
+      'Per la massa il programma non propone mai sedute per tutto il corpo: servono carichi alti, recuperi pieni fra le serie e più di un esercizio per gruppo, e in una seduta sola non ci starebbero.',
+    );
+  }
 
   reasons.push(
     `Obiettivo "${GOAL_LABELS[profile.goal].title.toLowerCase()}": ${GOAL_EXPLANATION[profile.goal]}.`,

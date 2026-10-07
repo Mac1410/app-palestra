@@ -128,6 +128,10 @@ const scenarios = [
   ['Priorità a glutei e dorso', { focus: ['Glutei', 'Dorso'], daysPerWeek: 4 }],
   ['Mantenimento, 1× 90min', { goal: 'mantenimento', daysPerWeek: 1, sessionMinutes: 90 }],
   ['Massa, 7× 45min', { daysPerWeek: 7, sessionMinutes: 45 }],
+  ['Massa, 2× 45min', { daysPerWeek: 2, sessionMinutes: 45 }],
+  ['Massa, 4× 45min', { daysPerWeek: 4, sessionMinutes: 45 }],
+  ['Massa, 5× 40min', { daysPerWeek: 5, sessionMinutes: 40 }],
+  ['Massa, 4× 75min', { daysPerWeek: 4, sessionMinutes: 75 }],
   ['Misto, principiante, 3× 60min', { place: 'misto', equipment: ['elastici'], experience: 'principiante' }],
 ];
 

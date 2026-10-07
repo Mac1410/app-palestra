@@ -239,6 +239,7 @@ export const SPLIT_KINDS = [
   'upper-lower',
   'push-pull-legs',
   'push-pull-legs-upper-lower',
+  'per-gruppo',
   'circuito',
 ] as const;
 
@@ -249,6 +250,7 @@ export const SPLIT_LABELS: Record<SplitKind, string> = {
   'upper-lower': 'Upper / Lower',
   'push-pull-legs': 'Push / Pull / Legs',
   'push-pull-legs-upper-lower': 'Push / Pull / Legs + Upper / Lower',
+  'per-gruppo': 'Per gruppo muscolare',
   circuito: 'Circuito a corpo libero',
 };
 
