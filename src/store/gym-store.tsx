@@ -13,7 +13,7 @@ import { BUILTIN_EXERCISES } from '@/data/exercises';
 import { type BackupData } from '@/lib/backup';
 import { createId } from '@/lib/id';
 import { buildProgram } from '@/lib/plan';
-import { lastPerformance } from '@/lib/stats';
+import { planExercise } from '@/lib/progression';
 import { clearState, loadState, saveState } from '@/store/storage';
 import {
   EMPTY_STATE,
@@ -298,27 +298,64 @@ export function GymProvider({ children }: { children: ReactNode }) {
   const value = useMemo<GymContextValue>(() => {
     const getExercise = (id: string) => exercisesById.get(id);
 
+    /**
+     * Costruisce l'esercizio della seduta chiedendo alla progressione che
+     * carico e quante ripetizioni proporre oggi: il risultato può anche essere
+     * una variante diversa, più facile o più difficile (vedi lib/progression).
+     */
     const buildSessionExercise = (
       exerciseId: string,
       options: { sets?: number; reps?: string; restSec?: number; weight?: number } = {},
     ): SessionExercise => {
-      const previous = lastPerformance(stateRef.current.sessions, exerciseId);
-      const setCount = options.sets ?? previous?.sets.length ?? 3;
-      const defaultRest = stateRef.current.settings.defaultRestSec;
+      const current = stateRef.current;
+      const catalog = [...BUILTIN_EXERCISES, ...current.customExercises];
+      const exercise = catalog.find((item) => item.id === exerciseId);
+
+      const plan = exercise
+        ? planExercise({
+            exercise,
+            catalog,
+            sessions: current.sessions,
+            target: {
+              sets: options.sets ?? 3,
+              reps: options.reps,
+              restSec: options.restSec ?? current.settings.defaultRestSec,
+              weight: options.weight,
+            },
+          })
+        : undefined;
+
+      if (!plan) {
+        return {
+          id: createId('sex'),
+          exerciseId,
+          restSec: options.restSec ?? current.settings.defaultRestSec,
+          targetReps: options.reps,
+          sets: Array.from({ length: options.sets ?? 3 }, () => ({
+            id: createId('set'),
+            weight: options.weight ?? 0,
+            reps: 0,
+            done: false,
+          })),
+        };
+      }
+
       return {
         id: createId('sex'),
-        exerciseId,
-        restSec: options.restSec ?? defaultRest,
-        targetReps: options.reps,
-        sets: Array.from({ length: setCount }, (_, i) => {
-          const reference = previous?.sets[i] ?? previous?.sets[previous.sets.length - 1];
-          return {
-            id: createId('set'),
-            weight: reference?.weight ?? options.weight ?? 0,
-            reps: reference?.reps ?? 0,
-            done: false,
-          };
-        }),
+        exerciseId: plan.exerciseId,
+        restSec: plan.restSec,
+        targetReps: plan.targetReps,
+        advice: plan.advice,
+        sets: plan.sets.map((set) => ({
+          id: createId('set'),
+          weight: set.weight,
+          // Le ripetizioni partono dall'obiettivo: si corregge solo se vanno
+          // diversamente, invece di doverle scrivere tutte da zero.
+          reps: set.targetReps,
+          targetReps: set.targetReps,
+          toFailure: set.toFailure,
+          done: false,
+        })),
       };
     };
 

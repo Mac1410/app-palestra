@@ -191,6 +191,11 @@ export default function SessionScreen() {
                       recupero {item.restSec}s
                       {best ? ` · ultima ${best.weight} kg × ${best.reps}` : ''}
                     </ThemedText>
+                    {item.advice ? (
+                      <ThemedText type="caption" themeColor="accent" style={styles.advice}>
+                        {item.advice}
+                      </ThemedText>
+                    ) : null}
                   </View>
                   <IconButton
                     icon="close"
@@ -216,6 +221,9 @@ export default function SessionScreen() {
                   </ThemedText>
                   <ThemedText type="caption" themeColor="textMuted" style={styles.colField}>
                     RIP
+                  </ThemedText>
+                  <ThemedText type="caption" themeColor="textMuted" style={styles.colTarget}>
+                    OBIETT.
                   </ThemedText>
                   <View style={styles.colCheck} />
                   <View style={styles.colRemove} />
@@ -255,6 +263,27 @@ export default function SessionScreen() {
                       />
                     </View>
 
+                    <View style={styles.colTarget}>
+                      {set.targetReps ? (
+                        <ThemedText
+                          type="smallBold"
+                          themeColor={
+                            !set.done
+                              ? 'textMuted'
+                              : set.reps >= set.targetReps
+                                ? 'success'
+                                : 'danger'
+                          }
+                          style={styles.center}>
+                          {set.toFailure ? `${set.targetReps}+` : set.targetReps}
+                        </ThemedText>
+                      ) : (
+                        <ThemedText type="small" themeColor="textMuted" style={styles.center}>
+                          —
+                        </ThemedText>
+                      )}
+                    </View>
+
                     <Pressable
                       accessibilityLabel={set.done ? 'Serie completata' : 'Segna come completata'}
                       onPress={() => toggleSet(item.id, set.id, !set.done, item.restSec)}
@@ -281,6 +310,13 @@ export default function SessionScreen() {
                     />
                   </View>
                 ))}
+
+                {item.sets.some((set) => set.toFailure) ? (
+                  <ThemedText type="caption" themeColor="textMuted">
+                    L’ultima serie è a cedimento: vai fin dove arrivi e scrivi quante ne hai
+                    fatte. È il numero su cui il programma decide la prossima volta.
+                  </ThemedText>
+                ) : null}
 
                 <View style={styles.exerciseFooter}>
                   <Button
@@ -375,6 +411,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.half,
   },
   colIndex: { width: 24, alignItems: 'center' },
+  advice: { marginTop: 2 },
+  colTarget: { width: 46, alignItems: 'center', justifyContent: 'center' },
   colField: { flex: 1 },
   colCheck: { width: 44, height: 36 },
   colRemove: { width: 30 },

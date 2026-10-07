@@ -91,6 +91,7 @@ export const BUILTIN_EXERCISES: Exercise[] = [
   },
   {
     id: 'piegamenti',
+    progression: { family: 'piegamenti', level: 3 },
     name: 'Piegamenti sulle braccia',
     muscle: 'Petto',
     equipment: 'Corpo libero',
@@ -100,6 +101,7 @@ export const BUILTIN_EXERCISES: Exercise[] = [
   },
   {
     id: 'piegamenti-ginocchia',
+    progression: { family: 'piegamenti', level: 1 },
     name: 'Piegamenti sulle ginocchia',
     muscle: 'Petto',
     equipment: 'Corpo libero',
@@ -110,6 +112,7 @@ export const BUILTIN_EXERCISES: Exercise[] = [
   },
   {
     id: 'piegamenti-diamante',
+    progression: { family: 'piegamenti', level: 4 },
     name: 'Piegamenti a diamante',
     muscle: 'Tricipiti',
     equipment: 'Corpo libero',
@@ -147,6 +150,7 @@ export const BUILTIN_EXERCISES: Exercise[] = [
   // Dorso
   {
     id: 'trazioni',
+    progression: { family: 'trazioni', level: 2 },
     name: 'Trazioni alla sbarra',
     muscle: 'Dorso',
     equipment: 'Corpo libero',
@@ -318,6 +322,7 @@ export const BUILTIN_EXERCISES: Exercise[] = [
   },
   {
     id: 'pike-push-up',
+    progression: { family: 'pike', level: 2 },
     name: 'Piegamenti a V',
     muscle: 'Spalle',
     equipment: 'Corpo libero',
@@ -568,6 +573,7 @@ export const BUILTIN_EXERCISES: Exercise[] = [
   },
   {
     id: 'squat-corpo-libero',
+    progression: { family: 'squat-cl', level: 1 },
     name: 'Squat a corpo libero',
     muscle: 'Gambe',
     equipment: 'Corpo libero',
@@ -596,6 +602,7 @@ export const BUILTIN_EXERCISES: Exercise[] = [
   },
   {
     id: 'affondi-corpo-libero',
+    progression: { family: 'squat-cl', level: 2 },
     name: 'Affondi a corpo libero',
     muscle: 'Gambe',
     equipment: 'Corpo libero',
@@ -625,6 +632,7 @@ export const BUILTIN_EXERCISES: Exercise[] = [
   },
   {
     id: 'stacco-gamba-singola',
+    progression: { family: 'ponte', level: 3 },
     name: 'Stacco su una gamba',
     muscle: 'Gambe',
     equipment: 'Corpo libero',
@@ -670,6 +678,7 @@ export const BUILTIN_EXERCISES: Exercise[] = [
   },
   {
     id: 'glute-bridge',
+    progression: { family: 'ponte', level: 1 },
     name: 'Ponte per glutei',
     muscle: 'Glutei',
     equipment: 'Corpo libero',
@@ -678,6 +687,7 @@ export const BUILTIN_EXERCISES: Exercise[] = [
   },
   {
     id: 'glute-bridge-singola',
+    progression: { family: 'ponte', level: 2 },
     name: 'Ponte su una gamba',
     muscle: 'Glutei',
     equipment: 'Corpo libero',
@@ -825,6 +835,72 @@ export const BUILTIN_EXERCISES: Exercise[] = [
     stress: ['schiena'],
   },
 
+  {
+    id: 'piegamenti-rialzati',
+    name: 'Piegamenti con mani rialzate',
+    muscle: 'Petto',
+    equipment: 'Corpo libero',
+    pattern: 'spinta-orizzontale',
+    role: 'fondamentale',
+    stress: ['polso'],
+    progression: { family: 'piegamenti', level: 2 },
+    notes: 'Mani su un rialzo: più facili dei piegamenti a terra.',
+  },
+  {
+    id: 'piegamenti-archer',
+    name: 'Piegamenti ad arciere',
+    muscle: 'Petto',
+    equipment: 'Corpo libero',
+    pattern: 'spinta-orizzontale',
+    role: 'complementare',
+    stress: ['polso', 'spalla'],
+    progression: { family: 'piegamenti', level: 5 },
+    notes: 'Il peso si sposta su un braccio: il gradino prima della verticale a un braccio.',
+  },
+  {
+    id: 'trazioni-australiane',
+    name: 'Trazioni orizzontali',
+    muscle: 'Dorso',
+    equipment: 'Corpo libero',
+    pattern: 'trazione-orizzontale',
+    role: 'fondamentale',
+    gear: ['sbarra'],
+    progression: { family: 'trazioni', level: 1 },
+    notes: 'Corpo inclinato sotto una sbarra bassa: la via d\u2019accesso alle trazioni.',
+  },
+  {
+    id: 'pike-push-up-rialzato',
+    name: 'Piegamenti a V facilitati',
+    muscle: 'Spalle',
+    equipment: 'Corpo libero',
+    pattern: 'spinta-verticale',
+    role: 'complementare',
+    stress: ['polso'],
+    progression: { family: 'pike', level: 1 },
+    notes: 'Piedi a terra invece che su un rialzo.',
+  },
+  {
+    id: 'squat-bulgaro-cl',
+    name: 'Bulgarian split squat a corpo libero',
+    muscle: 'Gambe',
+    equipment: 'Corpo libero',
+    pattern: 'affondo',
+    role: 'complementare',
+    stress: ['ginocchio'],
+    gear: ['panca'],
+    progression: { family: 'squat-cl', level: 3 },
+  },
+  {
+    id: 'squat-pistola',
+    name: 'Squat su una gamba',
+    muscle: 'Gambe',
+    equipment: 'Corpo libero',
+    pattern: 'squat',
+    role: 'complementare',
+    stress: ['ginocchio'],
+    progression: { family: 'squat-cl', level: 4 },
+    notes: 'Tutto il peso su una gamba: il carico massimo senza attrezzi.',
+  },
   // Cardio
   {
     id: 'tapis-roulant',

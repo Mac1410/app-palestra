@@ -100,7 +100,7 @@ ripetizioni obiettivo e recupero. Tocco lungo su una scheda per duplicarla o
 eliminarla. Al primo avvio trovi quattro schede di esempio (Full body A, Push,
 Pull, Legs) che puoi modificare o cancellare.
 
-**Esercizi** — catalogo di 100 esercizi con ricerca e filtro per gruppo
+**Esercizi** — catalogo di 106 esercizi con ricerca e filtro per gruppo
 muscolare, più i tuoi esercizi personalizzati. La scheda di dettaglio mostra
 record di carico, 1RM stimato, andamento e storico completo.
 
@@ -112,10 +112,12 @@ storico di tutti gli allenamenti.
 (esportazione e reimportazione del file JSON) e cancellazione completa.
 
 **Allenamento in corso** — cronometro, volume e serie in tempo reale; per ogni
-esercizio una griglia kg × ripetizioni con spunta di completamento (tocca il
-numero della serie per marcarla come riscaldamento, esclusa da volume e record).
+esercizio una griglia kg × ripetizioni con l'obiettivo della singola serie
+accanto, verde se l'hai raggiunto e rosso se sei rimasto sotto (tocca il numero
+della serie per marcarla come riscaldamento, esclusa da volume e record).
 Completando una serie parte il timer di recupero, con +30s e possibilità di
-saltarlo. I carichi vengono precompilati con quelli dell'ultima volta.
+saltarlo. Carichi e obiettivi non sono una copia dell'ultima volta: li decide la
+progressione, che scrive anche perché.
 
 ## Direzione visiva
 
@@ -155,14 +157,16 @@ src/
   data/exercises.ts       catalogo di base e schede di esempio
   hooks/                  tema e feedback aptico
   lib/                    formattazione italiana, calcoli (volume, 1RM, streak),
-                          backup e generatore del programma (plan.ts)
+                          backup, generatore del programma (plan.ts) e
+                          progressione dei carichi (progression.ts)
   store/                  stato globale (reducer) e persistenza AsyncStorage
   types/                  modello dati
 scripts/
   build-web.mjs           costruisce la web app installabile
   serve-dist.mjs          la prova in locale come se fosse online
   deploy-pages.mjs        la pubblica su GitHub Pages
-  prova-programmi.mjs     genera i programmi di quindici profili e li controlla
+  prova-programmi.mjs     genera i programmi di diciannove profili e li controlla
+  prova-progressione.mjs  verifica le decisioni su carichi e varianti
 ```
 
 ## Come nasce il programma
@@ -204,9 +208,42 @@ Per verificare il generatore dopo una modifica:
 npm run check:plan
 ```
 
-Stampa le schede di quindici profili diversi e fallisce se una seduta sfora il
+Stampa le schede di diciannove profili diversi e fallisce se una seduta sfora il
 tempo, ripete un esercizio, ne usa uno vietato dalle limitazioni o richiede un
 attrezzo che a casa non c'è.
+
+## Come cresce il carico
+
+`src/lib/progression.ts` decide che carico e quante ripetizioni proporre oggi,
+guardando **solo le ultime tre settimane**: com'eri tre mesi fa non dice più
+niente su che carico reggi adesso.
+
+Il metodo è la doppia progressione. Si resta sullo stesso peso finché non si
+chiudono *tutte* le serie in cima all'intervallo di ripetizioni; allora si
+aggiunge un gradino di carico (2,5 kg di bilanciere, 1-2 kg di manubrio, 5 kg di
+macchina) e si riparte dal fondo dell'intervallo. Se invece l'obiettivo non
+viene raggiunto, prima si abbassa l'obiettivo di ripetizioni; se succede due
+volte di fila, si toglie il 10% di carico, perché insistere su un peso che non
+si muove non allena, logora.
+
+A corpo libero i chili non si possono aggiungere, quindi **il carico si cambia
+cambiando esercizio**: gli esercizi appartengono a scale di difficoltà
+(piegamenti sulle ginocchia → mani rialzate → a terra → a diamante → ad
+arciere; trazioni orizzontali → trazioni; squat a corpo libero → affondi →
+bulgaro → su una gamba). Superato l'intervallo si sale di un gradino, restando
+troppo sotto si scende. L'ultima serie di questi esercizi è a cedimento: è
+l'unico modo di misurare se si è diventati più forti quando il peso non cambia.
+
+Ogni scelta viene scritta in italiano sotto il nome dell'esercizio, tipo *"Hai
+chiuso tutte le serie a 8 ripetizioni: si sale a 42,5 kg e si riparte da 6"*.
+
+```bash
+npm run check:progressione
+```
+
+Verifica dodici situazioni: prima volta, obiettivo raggiunto, obiettivo
+mancato una volta e due volte di fila, gradini diversi per manubri e bilancieri,
+storico scaduto, salita e discesa di variante a corpo libero, esercizi a tempo.
 
 ## Note tecniche
 

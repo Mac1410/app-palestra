@@ -88,6 +88,11 @@ export type Exercise = {
   gear?: HomeGear[];
   /** Misurato in secondi anziché in ripetizioni (plank, cardio). */
   timed?: boolean;
+  /**
+   * Scala di difficoltà per gli esercizi a corpo libero: dove non si possono
+   * aggiungere chili, si sale di livello passando a una variante più dura.
+   */
+  progression?: { family: string; level: number };
 };
 
 /** Riga di una scheda: esercizio + parametri obiettivo. */
@@ -121,6 +126,13 @@ export type SetLog = {
   done: boolean;
   /** Le serie di riscaldamento non contano nel volume né nei record. */
   warmup?: boolean;
+  /**
+   * Ripetizioni richieste da questa serie. È l'obiettivo da battere: se non
+   * viene raggiunto, la volta dopo il programma abbassa carico o ripetizioni.
+   */
+  targetReps?: number;
+  /** Serie da portare a cedimento: si scrive quante se ne sono fatte. */
+  toFailure?: boolean;
 };
 
 export type SessionExercise = {
@@ -130,6 +142,11 @@ export type SessionExercise = {
   targetReps?: string;
   sets: SetLog[];
   note?: string;
+  /**
+   * Perché oggi il programma propone questo carico, queste ripetizioni o
+   * questa variante: scritto in italiano e mostrato sotto il nome.
+   */
+  advice?: string;
 };
 
 export type Session = {
