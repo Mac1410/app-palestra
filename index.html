@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+    <title>Palestra</title>
+    <!-- The `react-native-web` recommended style reset: https://necolas.github.io/react-native-web/docs/setup/#root-element -->
+    <style id="expo-reset">
+      /* These styles make the body full-height */
+      html,
+      body {
+        height: 100%;
+      }
+      /* These styles disable body scrolling if you are using <ScrollView> */
+      body {
+        overflow: hidden;
+      }
+      /* These styles make the root element full-height */
+      #root {
+        display: flex;
+        height: 100%;
+        flex: 1;
+      }
+    </style>
+  <link rel="icon" href="/app-palestra/favicon.ico"/><link rel="preload" href="/app-palestra/_expo/static/css/global-87fd0564cfa78f37afcb8d7603e15d75.css" as="style">
+<link rel="stylesheet" href="/app-palestra/_expo/static/css/global-87fd0564cfa78f37afcb8d7603e15d75.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="description" content="Schede, allenamenti e progressi in palestra." />
+    <link rel="manifest" href="/app-palestra/manifest.webmanifest" />
+    <meta name="theme-color" content="#18231D" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="Palestra" />
+    <link rel="apple-touch-icon" href="/app-palestra/icona-app.png" />
+    <style id="palestra-shell">
+      html, body { background-color: #18231D; }
+      body {
+        /* Niente rimbalzo elastico: in un'app a schermo intero sembra un difetto. */
+        overscroll-behavior: none;
+        -webkit-text-size-adjust: 100%;
+        -webkit-tap-highlight-color: transparent;
+        /* Il testo non si seleziona tenendo premuto, ma nei campi sì. */
+        -webkit-user-select: none;
+        user-select: none;
+      }
+      input, textarea { -webkit-user-select: text; user-select: text; }
+    </style>
+    <script id="palestra-sw">
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker
+            .register('/app-palestra/sw.js', { scope: '/app-palestra/' })
+            .catch(function (error) { console.warn('[palestra] service worker non registrato', error); });
+        });
+      }
+      // Chiede al browser di non sfrattare gli allenamenti salvati.
+      if (navigator.storage && navigator.storage.persist) {
+        navigator.storage.persisted().then(function (already) {
+          if (!already) navigator.storage.persist();
+        });
+      }
+    </script>
+  </head>
+
+  <body>
+    <!-- Use static rendering with Expo Router to support running without JavaScript. -->
+    <noscript>
+      You need to enable JavaScript to run this app.
+    </noscript>
+    <!-- The root element for your Expo app. -->
+    <div id="root"></div>
+  <script src="/app-palestra/_expo/static/js/web/entry-1956b3c7fc4511f70aeff39a48db40c6.js" defer></script>
+</body>
+</html>

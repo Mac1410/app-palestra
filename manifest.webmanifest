@@ -1,0 +1,33 @@
+{
+  "name": "Palestra",
+  "short_name": "Palestra",
+  "description": "Schede, allenamenti e progressi in palestra.",
+  "lang": "it",
+  "dir": "ltr",
+  "start_url": "/app-palestra/",
+  "scope": "/app-palestra/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#18231D",
+  "theme_color": "#18231D",
+  "icons": [
+    {
+      "src": "/app-palestra/icona-app.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/app-palestra/icona-app.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Allenamento in corso",
+      "url": "/app-palestra/sessione"
+    }
+  ]
+}
